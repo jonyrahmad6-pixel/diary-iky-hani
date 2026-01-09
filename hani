@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diary Iky & Hani 💖</title>
+
+<!-- FONT TULISAN TANGAN -->
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;
+ font-family:'Patrick Hand',cursive;
+ transition:background 2s;
+ background:linear-gradient(to top,#ff9a9e,#fad0c4);
+}
+body.night{
+ background:radial-gradient(circle at top,#2c3e50,#0b0c10);
+}
+.overlay{
+ min-height:100vh;
+ background:rgba(0,0,0,.45);
+ padding:20px;color:white;
+}
+.card{
+ background:rgba(255,255,255,.18);
+ backdrop-filter:blur(14px);
+ border-radius:22px;
+ padding:20px;
+ max-width:520px;
+ margin:auto;
+}
+input,textarea{
+ width:100%;
+ border:none;border-radius:12px;
+ padding:10px;margin:6px 0;
+ font-family:'Patrick Hand',cursive;
+}
+button{
+ border:none;border-radius:20px;
+ padding:10px;background:#fd79a8;
+ color:white;cursor:pointer;margin:4px 0;
+}
+.entry{
+ background:rgba(0,0,0,.4);
+ padding:10px;border-radius:15px;
+ margin-top:10px;cursor:pointer;
+}
+.entry:hover{background:rgba(255,255,255,.15)}
+small{opacity:.7}
+
+/* BOOK */
+.book{perspective:1200px}
+.page{
+ background:#fff;color:#333;
+ padding:20px;border-radius:15px;
+ transform-origin:left;
+ transition:transform 1s;
+}
+.page.open{transform:rotateY(-160deg)}
+
+/* KOMENTAR */
+.comment{
+ background:rgba(255,255,255,.2);
+ padding:8px;border-radius:12px;
+ margin-top:6px;
+}
+.comment.me{background:#74b9ff}
+.comment.hani{background:#fd79a8}
+.reactions span{cursor:pointer;margin-right:6px}
+
+/* KALENDER */
+#calendar{
+ display:grid;
+ grid-template-columns:repeat(7,1fr);
+ gap:6px;margin-top:10px;
+}
+.day{
+ padding:8px;
+ background:rgba(255,255,255,.15);
+ border-radius:10px;
+ text-align:center;cursor:pointer;
+}
+.day.has{background:#fd79a8;box-shadow:0 0 10px #fd79a8}
+
+/* HUJAN */
+.rain{position:fixed;inset:0;pointer-events:none}
+.drop{
+ position:absolute;width:2px;height:15px;
+ background:rgba(255,255,255,.4);
+ animation:rain linear infinite;
+}
+@keyframes rain{to{transform:translateY(110vh)}}
+</style>
+</head>
+
+<body>
+<div class="rain" id="rain"></div>
+
+<div class="overlay">
+
+<!-- LOGIN -->
+<div class="card" id="login">
+<h2>👩‍❤️‍👨 Login Iky & Hani</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Masuk</button>
+</div>
+
+<!-- APP -->
+<div class="card" id="app" style="display:none">
+<h2>📖 Diary Cinta Kita</h2>
+
+<button onclick="toggle()">🌅 / 🌙</button>
+<button onclick="music()">🎵 Musik</button>
+
+<input id="bgUrl" placeholder="URL Background Blogger">
+<button onclick="setBG()">🖼 Background</button>
+
+<textarea id="text" placeholder="Hari ini aku ingin cerita..."></textarea>
+<input type="file" id="photo">
+<button onclick="save()">💾 Simpan</button>
+
+<h3>📅 Kalender Kenangan</h3>
+<div id="calendar"></div>
+
+<h3>📜 Daftar Kisah</h3>
+<div id="list"></div>
+</div>
+
+<!-- DETAIL -->
+<div id="detail" style="display:none">
+<div class="card book">
+<button onclick="closeDetail()">⬅ Kembali</button>
+<div class="page" id="page"></div>
+
+<h4>💬 Komentar</h4>
+<div id="commentList"></div>
+<input id="commentText" placeholder="Komentar kamu...">
+<button onclick="sendComment()">Kirim 💖</button>
+</div>
+</div>
+
+</div>
+
+<audio id="bgm" loop>
+<source src="URL_MUSIK_MP3_KAMU" type="audio/mpeg">
+</audio>
+
+<script>
+// FIREBASE CONFIG
+const firebaseConfig={
+ apiKey:"API_KEY",
+ authDomain:"PROJECT.firebaseapp.com",
+ databaseURL:"https://PROJECT.firebaseio.com",
+ projectId:"PROJECT",
+ storageBucket:"PROJECT.appspot.com"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+
+let currentUser="Iky";
+let currentDiary=null;
+
+// LOGIN
+function login(){
+ auth.signInWithEmailAndPassword(email.value,password.value)
+ .catch(()=>alert("Login gagal"));
+}
+auth.onAuthStateChanged(u=>{
+ if(u){
+  login.style.display="none";
+  app.style.display="block";
+  currentUser=u.email.includes("hani")?"Hani":"Iky";
+ }
+});
+
+// MODE
+function toggle(){
+ document.body.classList.toggle("night");
+}
+
+// MUSIC
+function music(){
+ bgm.paused?bgm.play():bgm.pause();
+}
+
+// BG
+function setBG(){
+ document.body.style.backgroundImage=`url(${bgUrl.value})`;
+ localStorage.setItem("bg",bgUrl.value);
+}
+let bg=localStorage.getItem("bg");
+if(bg) document.body.style.backgroundImage=`url(${bg})`;
+
+// SAVE
+function save(){
+ let t=text.value.trim();
+ if(!t) return;
+ let id=Date.now();
+ let f=photo.files[0];
+ if(f){
+  let ref=storage.ref("photos/"+id);
+  ref.put(f).then(()=>ref.getDownloadURL().then(url=>{
+   db.ref("diary/"+id).set({text:t,date:new Date().toLocaleString(),photo:url});
+  }));
+ }else{
+  db.ref("diary/"+id).set({text:t,date:new Date().toLocaleString()});
+ }
+ text.value="";photo.value="";
+}
+
+// LOAD
+db.ref("diary").on("value",s=>{
+ list.innerHTML="";calendar.innerHTML="";
+ let data=s.val()||{};
+ let now=new Date();
+ let days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+
+ for(let d=1;d<=days;d++){
+  let c=document.createElement("div");
+  c.className="day";c.innerText=d;
+  for(let id in data){
+   let dt=new Date(data[id].date);
+   if(dt.getDate()==d){c.classList.add("has");c.onclick=()=>openDetail(id)}
+  }
+  calendar.appendChild(c);
+ }
+
+ for(let id in data){
+  let e=document.createElement("div");
+  e.className="entry";
+  e.innerHTML=`<b>${data[id].date}</b><br>${data[id].text.slice(0,60)}...`;
+  e.onclick=()=>openDetail(id);
+  list.prepend(e);
+ }
+});
+
+// DETAIL
+function openDetail(id){
+ currentDiary=id;
+ db.ref("diary/"+id).once("value").then(s=>{
+  let d=s.val();
+  page.innerHTML=`<h3>${d.date}</h3><p>${d.text}</p>${d.photo?`<img src="${d.photo}">`:""}`;
+  detail.style.display="block";
+  app.style.display="none";
+  setTimeout(()=>page.classList.add("open"),200);
+  loadComments();
+ });
+}
+function closeDetail(){
+ page.classList.remove("open");
+ setTimeout(()=>{
+  detail.style.display="none";
+  app.style.display="block";
+ },600);
+}
+
+// KOMENTAR
+function loadComments(){
+ commentList.innerHTML="";
+ db.ref("diary/"+currentDiary+"/comments").on("value",s=>{
+  commentList.innerHTML="";
+  let d=s.val()||{};
+  for(let id in d){
+   let c=d[id];
+   let div=document.createElement("div");
+   div.className="comment "+(c.user=="Iky"?"me":"hani");
+   div.innerHTML=`
+    <b>${c.user}</b>: ${c.text}
+    <div class="reactions">
+     <span onclick="react('${id}','❤️')">❤️ ${c.react?.['❤️']||0}</span>
+     <span onclick="react('${id}','🥺')">🥺 ${c.react?.['🥺']||0}</span>
+     <span onclick="react('${id}','😆')">😆 ${c.react?.['😆']||0}</span>
+    </div>
+    <small>${c.time}</small>`;
+   commentList.appendChild(div);
+  }
+ });
+}
+function sendComment(){
+ if(!commentText.value) return;
+ let id=Date.now();
+ db.ref("diary/"+currentDiary+"/comments/"+id).set({
+  user:currentUser,
+  text:commentText.value,
+  time:new Date().toLocaleString()
+ });
+ commentText.value="";
+}
+function react(cid,emo){
+ db.ref(`diary/${currentDiary}/comments/${cid}/react/${emo}`)
+ .transaction(v=>(v||0)+1);
+}
+
+// HUJAN
+for(let i=0;i<80;i++){
+ let d=document.createElement("div");
+ d.className="drop";
+ d.style.left=Math.random()*100+"vw";
+ d.style.animationDuration=(0.8+Math.random())+"s";
+ rain.appendChild(d);
+}
+
+// PWA
+if("serviceWorker"in navigator){
+ navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+</body>
+</html>
