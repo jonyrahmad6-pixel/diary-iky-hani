@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Selamat Hary valentine dan Hari jadi Kita Sayangku 💜</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Hari Valentine & Hari Jadi Kita Sayangku 💜</title>
 
 <style>
 body {
@@ -11,6 +12,7 @@ body {
     background: radial-gradient(circle at top, #3a1c71, #5f2c82, #2b1055);
     overflow: hidden;
     text-align: center;
+    color: white;
 }
 
 /* bintang */
@@ -19,6 +21,7 @@ body {
     background: white;
     border-radius: 50%;
     animation: twinkle 2s infinite alternate;
+    will-change: opacity;
 }
 @keyframes twinkle {
     from { opacity: 0.3; }
@@ -32,6 +35,7 @@ body {
     height: 80px;
     background: linear-gradient(white, transparent);
     animation: shoot 1s linear forwards;
+    will-change: transform, opacity;
 }
 @keyframes shoot {
     from { transform: translate(0,0) rotate(45deg); opacity: 1; }
@@ -44,8 +48,8 @@ body {
     top: 40px;
     width: 100%;
     color: #ffd6ff;
-    font-size: 40px;
-    letter-spacing: 4px;
+    font-size: clamp(22px, 5vw, 40px);
+    letter-spacing: 3px;
     text-shadow: 0 0 20px #ffb3ff;
     animation: glow 3s infinite alternate;
 }
@@ -56,23 +60,22 @@ body {
 }
 
 h1 {
-    color: #fff;
     margin-top: 90px;
-    font-size: 2.8em;
+    font-size: clamp(28px, 6vw, 48px);
 }
 
 p {
     color: #f8eaff;
-    font-size: 1.2em;
+    font-size: clamp(14px, 4vw, 18px);
     line-height: 1.7;
 }
 
 .card {
     background: rgba(255,255,255,0.15);
-    margin: 60px auto;
-    padding: 30px;
-    width: 80%;
-    max-width: 600px;
+    margin: 50px auto;
+    padding: 25px;
+    width: 85%;
+    max-width: 520px;
     border-radius: 20px;
     backdrop-filter: blur(8px);
     box-shadow: 0 0 25px rgba(255,255,255,0.4);
@@ -86,20 +89,21 @@ p {
     font-size: 15px;
     opacity: 0.6;
     pointer-events: none;
+    will-change: transform;
 }
 .heart { animation: float 9s linear infinite; }
 @keyframes float {
     from { transform: translateY(110vh); opacity: 0; }
     to { transform: translateY(-10vh); opacity: 0.8; }
 }
-.flower, .choco { animation: drift 12s linear infinite; }
+.flower, .choco { animation: drift 14s linear infinite; }
 @keyframes drift { to { transform: translateY(-80px) rotate(360deg); } }
 
 /* beruang */
 #bear {
     display: none;
-    font-size: 70px;
-    margin-top: 20px;
+    font-size: 60px;
+    margin-top: 15px;
     animation: wave 1s infinite;
 }
 @keyframes wave {
@@ -113,17 +117,17 @@ p {
 
 /* tombol */
 button {
-    padding: 12px 25px;
+    padding: 12px 22px;
     border: none;
     border-radius: 30px;
     background: #b5179e;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     margin-top: 15px;
     transition: 0.3s;
 }
-button:hover { transform: scale(1.1); background: #ff4dff; }
+button:hover { transform: scale(1.05); background: #ff4dff; }
 
 /* kelopak */
 @keyframes fall {
@@ -136,7 +140,7 @@ button:hover { transform: scale(1.1); background: #ff4dff; }
 
 <div id="skyText">Untuk Sayangku.. ✨</div>
 
-<h1>💜 Selamat Hary valentine 💜</h1>
+<h1>💜 Selamat Hari Valentine 💜</h1>
 
 <div class="card">
     <p>Sayang…</p>
@@ -153,103 +157,111 @@ button:hover { transform: scale(1.1); background: #ff4dff; }
     <p id="typing" style="min-height:80px;"></p>
 </div>
 
-<audio autoplay loop>
+<audio id="bgm" loop>
   <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8a9c1a6f9a.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="clickSound" src="https://www.myinstants.com/media/sounds/pop-cat-original.mp3"></audio>
 
 <script>
+/* autoplay fix */
+document.body.addEventListener("click",()=>{
+  const bgm=document.getElementById("bgm");
+  if(bgm.paused) bgm.play();
+},{once:true});
+
 /* bintang statis */
-for(let i=0;i<120;i++){
+for(let i=0;i<100;i++){
     const s = document.createElement("div");
     s.className="star";
-    s.style.width = s.style.height = Math.random()*2 + 1 + "px";
+    const size=Math.random()*2+1;
+    s.style.width = s.style.height = size+"px";
     s.style.left = Math.random()*100 + "vw";
     s.style.top = Math.random()*100 + "vh";
     document.body.appendChild(s);
 }
 
 /* bintang jatuh */
-function shootingStar(){
-    const sh = document.createElement("div");
+setInterval(()=>{
+    const sh=document.createElement("div");
     sh.className="shooting";
-    sh.style.left = Math.random()*50 + "vw";
-    sh.style.top = Math.random()*50 + "vh";
+    sh.style.left=Math.random()*60+"vw";
+    sh.style.top=Math.random()*40+"vh";
     document.body.appendChild(sh);
     setTimeout(()=>sh.remove(),1000);
-}
-setInterval(shootingStar,4000);
+},4500);
 
 /* hearts */
-function createHeart() {
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.innerHTML = "💜";
-    h.style.left = Math.random()*100 + "vw";
-    h.style.fontSize = (14 + Math.random()*10) + "px";
-    h.style.animationDuration = (7 + Math.random()*4) + "s";
+let heartCount=0;
+setInterval(()=>{
+    if(heartCount>30) return;
+    heartCount++;
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="💜";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(14+Math.random()*10)+"px";
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(),10000);
-}
-setInterval(createHeart,800);
+    setTimeout(()=>{h.remove();heartCount--;},10000);
+},900);
 
 /* bunga & coklat */
-function createDecor(icon, cls) {
-    const d = document.createElement("div");
-    d.className = cls;
-    d.innerHTML = icon;
-    d.style.left = Math.random()*100 + "vw";
-    d.style.top = Math.random()*100 + "vh";
-    document.body.appendChild(d);
+for(let i=0;i<8;i++){
+  const f=document.createElement("div");
+  f.className="flower";f.innerHTML="🌸";
+  f.style.left=Math.random()*100+"vw";
+  f.style.top=Math.random()*100+"vh";
+  document.body.appendChild(f);
+
+  const c=document.createElement("div");
+  c.className="choco";c.innerHTML="🍫";
+  c.style.left=Math.random()*100+"vw";
+  c.style.top=Math.random()*100+"vh";
+  document.body.appendChild(c);
 }
-for(let i=0;i<10;i++){ createDecor("🌸","flower"); createDecor("🍫","choco"); }
 
 /* typing */
-const messages = [
+const messages=[
  "Sayang, kamu adalah bintang dalam hidupku ✨",
  "Aku jatuh cinta padamu bahkan dalam diam 🌙",
  "Hatiku memilihmu, sekarang dan selamanya 💜",
  "Aku ingin menua bersamamu, Sayang 🤍",
  "Cintaku padamu tidak pernah redup ✨"
 ];
-let index = 0;
+let index=0;
 
-function showLove() {
-    const typing = document.getElementById("typing");
-    const bear = document.getElementById("bear");
-    const sound = document.getElementById("clickSound");
-
-    sound.currentTime = 0;
-    sound.play();
-    bear.style.display = "block";
-    typing.innerHTML = "";
-
-    const text = messages[index];
-    let i = 0;
-    const timer = setInterval(() => {
-        typing.innerHTML += text.charAt(i);
-        i++;
-        if (i >= text.length) clearInterval(timer);
-    }, 50);
-
-    index = (index + 1) % messages.length;
+function showLove(){
+  const typing=document.getElementById("typing");
+  const bear=document.getElementById("bear");
+  const sound=document.getElementById("clickSound");
+  sound.currentTime=0; sound.play();
+  bear.style.display="block";
+  typing.innerHTML="";
+  const text=messages[index];
+  let i=0;
+  const timer=setInterval(()=>{
+    typing.innerHTML+=text.charAt(i);
+    i++; if(i>=text.length) clearInterval(timer);
+  },50);
+  index=(index+1)%messages.length;
 }
 
 /* kelopak */
-function createPetal() {
-    const p = document.createElement("div");
-    p.innerHTML = "🌸";
-    p.style.position = "absolute";
-    p.style.left = Math.random()*100 + "vw";
-    p.style.top = "-10px";
-    p.style.fontSize = "14px";
-    p.style.opacity = "0.7";
-    p.style.animation = "fall 12s linear";
-    document.body.appendChild(p);
-    setTimeout(()=>p.remove(),12000);
-}
-setInterval(createPetal,1000);
+let petalCount=0;
+setInterval(()=>{
+  if(petalCount>20) return;
+  petalCount++;
+  const p=document.createElement("div");
+  p.innerHTML="🌸";
+  p.style.position="absolute";
+  p.style.left=Math.random()*100+"vw";
+  p.style.top="-10px";
+  p.style.fontSize="14px";
+  p.style.opacity="0.7";
+  p.style.animation="fall 12s linear";
+  document.body.appendChild(p);
+  setTimeout(()=>{p.remove();petalCount--;},12000);
+},1200);
 </script>
 
 </body>
