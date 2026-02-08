@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Selamat Hary valentine dan Hari jadi Kita Sayangku 💜</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    background: radial-gradient(circle at top, #3a1c71, #5f2c82, #2b1055);
+    overflow: hidden;
+    text-align: center;
+}
+
+/* bintang */
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+}
+
+/* bintang jatuh */
+.shooting {
+    position: absolute;
+    width: 2px;
+    height: 80px;
+    background: linear-gradient(white, transparent);
+    animation: shoot 1s linear forwards;
+}
+@keyframes shoot {
+    from { transform: translate(0,0) rotate(45deg); opacity: 1; }
+    to { transform: translate(300px,300px) rotate(45deg); opacity: 0; }
+}
+
+/* tulisan langit */
+#skyText {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    color: #ffd6ff;
+    font-size: 40px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px #ffb3ff;
+    animation: glow 3s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px #fff; }
+    to { text-shadow: 0 0 25px #ff7aff; }
+}
+
+h1 {
+    color: #fff;
+    margin-top: 90px;
+    font-size: 2.8em;
+}
+
+p {
+    color: #f8eaff;
+    font-size: 1.2em;
+    line-height: 1.7;
+}
+
+.card {
+    background: rgba(255,255,255,0.15);
+    margin: 60px auto;
+    padding: 30px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+    position: relative;
+    z-index: 10;
+}
+
+/* dekor */
+.heart, .flower, .choco {
+    position: absolute;
+    font-size: 15px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+.heart { animation: float 9s linear infinite; }
+@keyframes float {
+    from { transform: translateY(110vh); opacity: 0; }
+    to { transform: translateY(-10vh); opacity: 0.8; }
+}
+.flower, .choco { animation: drift 12s linear infinite; }
+@keyframes drift { to { transform: translateY(-80px) rotate(360deg); } }
+
+/* beruang */
+#bear {
+    display: none;
+    font-size: 70px;
+    margin-top: 20px;
+    animation: wave 1s infinite;
+}
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(20deg); }
+  40% { transform: rotate(-20deg); }
+  60% { transform: rotate(20deg); }
+  80% { transform: rotate(-20deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* tombol */
+button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    background: #b5179e;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+button:hover { transform: scale(1.1); background: #ff4dff; }
+
+/* kelopak */
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="skyText">Untuk Sayangku.. ✨</div>
+
+<h1>💜 Selamat Hary valentine 💜</h1>
+
+<div class="card">
+    <p>Sayang…</p>
+    <p>
+        Di bawah langit malam ini, cintaku padamu  
+        setenang bintang dan setulus cahaya bulan 🌙
+    </p>
+
+    <p><b>Aku mencintaimu, Sayang 💜</b></p>
+
+    <button onclick="showLove()">Klik di sini 💌</button>
+
+    <div id="bear">🧸</div>
+    <p id="typing" style="min-height:80px;"></p>
+</div>
+
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8a9c1a6f9a.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="clickSound" src="https://www.myinstants.com/media/sounds/pop-cat-original.mp3"></audio>
+
+<script>
+/* bintang statis */
+for(let i=0;i<120;i++){
+    const s = document.createElement("div");
+    s.className="star";
+    s.style.width = s.style.height = Math.random()*2 + 1 + "px";
+    s.style.left = Math.random()*100 + "vw";
+    s.style.top = Math.random()*100 + "vh";
+    document.body.appendChild(s);
+}
+
+/* bintang jatuh */
+function shootingStar(){
+    const sh = document.createElement("div");
+    sh.className="shooting";
+    sh.style.left = Math.random()*50 + "vw";
+    sh.style.top = Math.random()*50 + "vh";
+    document.body.appendChild(sh);
+    setTimeout(()=>sh.remove(),1000);
+}
+setInterval(shootingStar,4000);
+
+/* hearts */
+function createHeart() {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerHTML = "💜";
+    h.style.left = Math.random()*100 + "vw";
+    h.style.fontSize = (14 + Math.random()*10) + "px";
+    h.style.animationDuration = (7 + Math.random()*4) + "s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),10000);
+}
+setInterval(createHeart,800);
+
+/* bunga & coklat */
+function createDecor(icon, cls) {
+    const d = document.createElement("div");
+    d.className = cls;
+    d.innerHTML = icon;
+    d.style.left = Math.random()*100 + "vw";
+    d.style.top = Math.random()*100 + "vh";
+    document.body.appendChild(d);
+}
+for(let i=0;i<10;i++){ createDecor("🌸","flower"); createDecor("🍫","choco"); }
+
+/* typing */
+const messages = [
+ "Sayang, kamu adalah bintang dalam hidupku ✨",
+ "Aku jatuh cinta padamu bahkan dalam diam 🌙",
+ "Hatiku memilihmu, sekarang dan selamanya 💜",
+ "Aku ingin menua bersamamu, Sayang 🤍",
+ "Cintaku padamu tidak pernah redup ✨"
+];
+let index = 0;
+
+function showLove() {
+    const typing = document.getElementById("typing");
+    const bear = document.getElementById("bear");
+    const sound = document.getElementById("clickSound");
+
+    sound.currentTime = 0;
+    sound.play();
+    bear.style.display = "block";
+    typing.innerHTML = "";
+
+    const text = messages[index];
+    let i = 0;
+    const timer = setInterval(() => {
+        typing.innerHTML += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(timer);
+    }, 50);
+
+    index = (index + 1) % messages.length;
+}
+
+/* kelopak */
+function createPetal() {
+    const p = document.createElement("div");
+    p.innerHTML = "🌸";
+    p.style.position = "absolute";
+    p.style.left = Math.random()*100 + "vw";
+    p.style.top = "-10px";
+    p.style.fontSize = "14px";
+    p.style.opacity = "0.7";
+    p.style.animation = "fall 12s linear";
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),12000);
+}
+setInterval(createPetal,1000);
+</script>
+
+</body>
+</html>
