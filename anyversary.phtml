@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Hani 💖</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{
+    min-height:100vh;
+    background:linear-gradient(to top,#ff9a9e,#fad0c4);
+    color:white;
+    overflow-x:hidden;
+    transition:background 3s ease;
+}
+body.night{
+    background:radial-gradient(circle at bottom,#1b2735,#090a0f);
+}
+.star{position:fixed;width:2px;height:2px;background:white;border-radius:50%;opacity:.8;animation:twinkle 2s infinite alternate;}
+@keyframes twinkle{from{opacity:.3}to{opacity:1;}}
+.moon{position:fixed;top:50px;right:40px;width:90px;height:90px;background:radial-gradient(circle,#fff,#dfe6e9);border-radius:50%;box-shadow:0 0 40px white;opacity:0;transition:opacity 3s;}
+body.night .moon{opacity:1;}
+
+/* Splash fantasy */
+.splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:10;overflow:hidden;}
+.aurora, .aurora2{position:absolute;inset:0;filter:blur(90px);opacity:0.6;}
+.aurora{background:linear-gradient(120deg, rgba(0,255,200,.3), rgba(255,0,255,.3), rgba(0,100,255,.3));animation:auroraMove 12s ease-in-out infinite alternate;}
+.aurora2{background:linear-gradient(60deg, rgba(255,200,0,.25), rgba(255,0,150,.25), rgba(0,255,255,.25));animation:auroraMove2 18s ease-in-out infinite alternate;}
+@keyframes auroraMove{from{transform: translateX(-25%) rotate(0deg);}to{transform: translateX(25%) rotate(5deg);}}
+@keyframes auroraMove2{from{transform: translateX(25%) rotate(0deg);}to{transform: translateX(-25%) rotate(-5deg);}}
+.splash-text{position:relative;text-align:center;}
+.narration{opacity:1;text-align:center;font-size:1.2em;line-height:1.8;margin-top:25px;}
+.candles{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap;justify-content:center;}
+.candle{width:12px;height:50px;background:#eee;border-radius:5px;position:relative;opacity:0;animation:candleIn 1s forwards;}
+.candle::before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:8px;height:12px;background:orange;border-radius:50%;opacity:0;animation:flame 1s infinite alternate;}
+@keyframes flame{from{transform:translateX(-50%) scale(1);}to{transform:translateX(-50%) scale(1.2);}}
+@keyframes candleIn{to{opacity:1;}}
+
+/* Main container */
+.container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 2s;}
+.container.show{opacity:1;}
+
+/* Card */
+.card{background:rgba(255,255,255,.15);backdrop-filter:blur(12px);padding:22px;border-radius:20px;max-width:500px;width:100%;text-align:center;box-shadow:0 0 30px rgba(255,255,255,.2);}
+
+/* Photos */
+.photos{display:flex;justify-content:center;gap:15px;margin:15px 0;}
+.photos img{width:90px;aspect-ratio:1/1;border-radius:50%;object-fit:cover;border:3px solid white;animation:float 3s infinite;}
+
+/* Chat */
+.chat{background:rgba(0,0,0,.4);padding:12px;border-radius:15px;margin:15px 0;font-size:.9em;text-align:left;}
+.msg{margin:6px 0;padding:8px 12px;border-radius:15px;max-width:80%;opacity:0;}
+.me{background:#74b9ff;margin-left:auto;}
+.hani{background:#fd79a8;}
+
+/* Counter */
+.counter{margin:10px 0;color:#ffeaa7;font-weight:bold;font-size:1em;}
+
+/* Ending */
+.ending{margin-top:18px;font-size:1.2em;}
+button{margin-top:12px;padding:10px 20px;border:none;border-radius:20px;background:#fd79a8;color:white;font-size:1em;cursor:pointer;}
+button:hover{transform:scale(1.1);}
+
+/* Kelopak */
+.petal{position:fixed;top:-10px;animation:fall linear infinite;font-size:18px;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+
+/* Firework */
+.firework{position:fixed;width:4px;height:4px;background:white;border-radius:50%;animation:explode 1.5s ease-out;}
+@keyframes explode{0%{transform:scale(0);}60%{transform:scale(8);opacity:1;}100%{opacity:0;}}
+
+/* Floating & fadeIn */
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <div class="aurora"></div>
+  <div class="aurora2"></div>
+  <div class="splash-text">
+    <div class="narration" id="narration"></div>
+    <div class="candles" id="candles"></div>
+    <h1 style="margin-top:30px">For Hani 💖</h1>
+  </div>
+</div>
+
+<div class="moon"></div>
+
+<div class="container" id="main">
+<div class="card">
+<h1>💖 Happy Anniversary 💖</h1>
+<h2>Hani Handayani ✨</h2>
+
+<div class="photos">
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEin8crP4ZX_Cv-j1eeQPyiXfHZKNNjOKNmu7HYoYoJqP8Kp2vK88ew60fJkJTmw3pmIxznkY4b_ShmWpPhyphenhyphencY6t5cIghQ9Aaot0bTui-64osCqmW4ERAeQNscBfKrgP-Zx0oIDMaMT2zNVxt_lR7XcU9hCkQ3ziSIdzZZDkmqXI5A_V1K7ww1Mkd4FIJ9E/s1152/WhatsApp%20Image%202026-01-04%20at%2018.37.38.jpeg">
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi87u2k5hXhgPGqDPwmmpUlUJT_s8KuX15wy2IBbJcX7Ble4_05fq1JtTJZhjT_cCPbdo3jtmDI8yN4pDD_T3v8cB3YIO9f3D8fuAVBvO2bb-mepZcCo0Eg4l2HJ1UpJgtOrko101JaUMayf3tc933VQe8CNnUI0riORQTxazU5ofe5ZkOL2rXnM0KLyQE/s1257/WhatsApp%20Image%202026-01-04%20at%2018.38.49.jpeg">
+</div>
+
+<div class="counter" id="counter"></div>
+
+<div class="chat" id="chat">
+    <div class="msg me">Iky: Hani…</div>
+    <div class="msg hani">Kenapa sih 😆</div>
+    <div class="msg me">Iky: Aku kepikiran kamu lagi</div>
+    <div class="msg hani">Kok bisa? 😳</div>
+    <div class="msg me">Iky: Soalnya kamu nggak pernah pergi dari pikiran aku</div>
+    <div class="msg hani">Gombal 😆</div>
+    <div class="msg me">Iky: Tapi jujur, aku nyaman sama kamu</div>
+    <div class="msg hani">Aku juga… 🥺🤍</div>
+</div>
+
+<div class="ending">
+💍 <b>I love you forever</b> 💍<br>
+<button onclick="promise()">Aku Janji 🤍</button>
+</div>
+</div>
+</div>
+
+<audio id="bgm" loop>
+  <source src="URL_MUSIK_MP3_KAMU" type="audio/mpeg">
+</audio>
+
+<script>
+// ⭐ Bintang
+for(let i=0;i<120;i++){
+    let s=document.createElement("div");
+    s.className="star";
+    s.style.top=Math.random()*100+"vh";
+    s.style.left=Math.random()*100+"vw";
+    document.body.appendChild(s);
+}
+
+// 🌸 Kelopak jatuh
+for(let i=0;i<30;i++){
+    let p=document.createElement("div");
+    p.className="petal";
+    p.innerHTML="🌸";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(6+Math.random()*5)+"s";
+    document.body.appendChild(p);
+}
+
+// ⭐ Lilin
+const candlesContainer = document.getElementById("candles");
+for(let i=0;i<12;i++){
+    let c=document.createElement("div");
+    c.className="candle";
+    c.style.animationDelay=(i*0.4)+"s";
+    candlesContainer.appendChild(c);
+}
+
+// ⭐ Narasi per kata
+const narrationEl = document.getElementById("narration");
+const text = "makasih ya sayang udah nemenin aku selama ini, maaf ya sayang aku gak bisa nemenin kamu secara langsung";
+const words = text.split(" ");
+let index = 0;
+function showWord(){
+    if(index<words.length){
+        narrationEl.innerHTML += words[index]+" ";
+        let delay=400;
+        if(words[index].includes(",")) delay=800;
+        if(words[index].includes(".")) delay=1200;
+        index++;
+        setTimeout(showWord, delay);
+    }else{
+        endSplash();
+    }
+}
+setTimeout(showWord, 500);
+
+// ⭐ Splash fade out
+function endSplash(){
+    document.getElementById("splash").style.opacity="0";
+    setTimeout(()=>{
+        document.getElementById("splash").style.display="none";
+        document.getElementById("main").classList.add("show");
+        document.body.classList.add("night");
+        const audio = document.getElementById("bgm");
+        if(audio){
+            audio.volume=0;
+            audio.play().catch(()=>{});
+            let vol=0;
+            const fadeIn=setInterval(()=>{
+                if(vol<1){vol+=0.02; audio.volume=vol;}else{clearInterval(fadeIn);}
+            },200);
+        }
+        startTypingChat();
+        startAutoFireworks();
+    },2000);
+}
+
+// ⏳ Counter real-time
+function updateCounter(){
+    const counterEl=document.getElementById("counter");
+    const now=new Date();
+    const start=new Date(2025,11,9);
+    const diffMs = now - start;
+    const days=Math.floor(diffMs/(1000*60*60*24));
+    const months=Math.floor(days/30);
+    const remainingDays = days%30;
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    counterEl.innerHTML=`⏳ Kita sudah bersama ${months} bulan ${remainingDays} hari ${hours} jam ${minutes} menit ${seconds} detik sejak tanggal 9 Desember 2025 💕`;
+}
+setInterval(updateCounter,1000);
+updateCounter();
+
+// 💬 Chat typing per huruf
+function startTypingChat(){
+    const chat=document.querySelectorAll("#chat .msg");
+    let i=0;
+    function typeMsg(){
+        if(i<chat.length){
+            chat[i].style.opacity="1";
+            const textContent = chat[i].textContent;
+            chat[i].textContent="";
+            let j=0;
+            function typeChar(){
+                if(j<textContent.length){
+                    chat[i].textContent += textContent[j];
+                    j++;
+                    let delay = 50;
+                    if(textContent[j-1]==","||textContent[j-1]==".") delay=250;
+                    setTimeout(typeChar, delay);
+                }else{
+                    i++;
+                    setTimeout(typeMsg, 300);
+                }
+            }
+            typeChar();
+        }
+    }
+    typeMsg();
+}
+
+// 🎆 Fireworks otomatis
+function startAutoFireworks(){
+    setInterval(()=>{
+        let f=document.createElement("div");
+        f.className="firework";
+        f.style.left=Math.random()*100+"vw";
+        f.style.top=Math.random()*50+"vh";
+        document.body.appendChild(f);
+        setTimeout(()=>f.remove(),1500);
+    },2000);
+}
+
+// 💍 Janji + firework tambahan
+function promise(){
+    alert("Aku cinta kamu selamanya, Hani 💖");
+    let fw=setInterval(()=>{
+        let f=document.createElement("div");
+        f.className="firework";
+        f.style.left=Math.random()*100+"vw";
+        f.style.top=Math.random()*50+"vh";
+        document.body.appendChild(f);
+        setTimeout(()=>f.remove(),1500);
+    },700);
+}
+</script>
+</body>
+</html>
