@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iky & Hany — Violet Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{
+  min-height:100vh;color:white;overflow:hidden;
+  background:
+    radial-gradient(1200px 600px at 15% 10%, rgba(123,92,255,.35), transparent 60%),
+    radial-gradient(900px 500px at 85% 25%, rgba(255,126,179,.25), transparent 60%),
+    linear-gradient(135deg,#2b1055,#4b2a8a,#7b5cff);
+  display:flex;justify-content:center;align-items:center;
+}
+.fog{position:fixed;inset:0;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 60%);filter:blur(30px);animation:fog 10s infinite alternate;pointer-events:none}
+@keyframes fog{to{transform:scale(1.1)}}
+
+.card{
+  width:95%;max-width:900px;padding:25px;border-radius:25px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(12px);
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  text-align:center;position:relative;
+}
+h1{font-size:2.5rem;margin-bottom:5px}
+.scene{display:flex;justify-content:center;gap:30px;margin:20px 0;flex-wrap:wrap}
+.char{
+  width:160px;height:160px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.8rem;font-weight:bold;
+  box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 10px 20px rgba(255,255,255,.35);
+  animation:float 4s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
+}
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+@keyframes float{50%{transform:translateY(-10px)}}
+@keyframes glow{to{box-shadow:0 0 30px #ff7eb3, 0 20px 40px rgba(0,0,0,.4)}}
+.name{margin-top:8px;font-weight:600}
+
+#story{
+  margin-top:15px;min-height:160px;
+  background:rgba(255,255,255,.1);
+  border-radius:16px;padding:16px;line-height:1.7;
+  animation:fade .5s;
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.controls{margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+button{
+  padding:10px 20px;border:none;border-radius:999px;
+  background:#ff7eb3;color:white;font-weight:bold;cursor:pointer;
+}
+button.alt{background:#7b5cff}
+
+.hearts{position:absolute;inset:0;pointer-events:none}
+.heart{position:absolute;bottom:-20px;animation:rise 6s linear infinite;opacity:.8}
+@keyframes rise{to{transform:translateY(-120vh);opacity:0}}
+</style>
+</head>
+<body>
+<div class="fog"></div>
+<div class="card">
+  <h1>💜 Iky & Hany 💜</h1>
+  <div>Kisah Petualangan di Dunia Violet</div>
+
+  <div class="scene">
+    <div>
+      <div class="char bear">🐻</div>
+      <div class="name">Iky</div>
+    </div>
+    <div>
+      <div class="char panda">🐼</div>
+      <div class="name">Hany</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prev()">⟵</button>
+    <button class="alt" onclick="next()">⟶</button>
+    <label class="alt" style="padding:10px 20px;border-radius:999px;cursor:pointer;">
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+  </div>
+
+  <div id="story"></div>
+  <div class="hearts" id="hearts"></div>
+  <audio id="bgm" loop></audio>
+</div>
+
+<script>
+const parts = [
+
+"PART 1 — Petualang dari Utara\n\nIky dikenal sebagai petualang paling keras kepala di Kerajaan Auralis. Ia bukan pangeran, bukan ksatria berdarah bangsawan, hanya seorang pemuda dengan mantel cokelat lusuh dan pedang yang sudah lebih sering tergores daripada dipuji. Namun satu hal membuat namanya terkenal: ia selalu kembali hidup dari Hutan Violet, tempat yang dipenuhi monster dan kutukan. Suatu pagi, lonceng istana berdentang memanggilnya. Sang raja terbaring lemah, diracuni makhluk gelap. Satu-satunya obat hanyalah Ramuan Aethel, tumbuh di jantung hutan paling berbahaya di dunia.",
+
+"PART 2 — Misi yang Mustahil\n\nTabib kerajaan berkata ramuan itu dijaga oleh makhluk kuno yang tidak pernah membiarkan manusia mendekat. Banyak yang gagal, tak satu pun kembali. Iky menelan ludah, lalu tersenyum kecil. 'Kalau tidak ada yang kembali, berarti belum ada yang mencoba sekeras aku.' Dengan bekal seadanya dan perut yang sudah lapar sebelum berangkat, ia melangkah ke gerbang hutan. Udara berubah dingin, pepohonan berkilau ungu, dan suara yang bukan milik dunia manusia mulai terdengar.",
+
+"PART 3 — Monster Pertama\n\nBaru beberapa jam berjalan, tanah di depannya retak. Dari bawah muncul makhluk seperti serigala batu bermata merah. Iky berteriak setengah panik, setengah sok berani. Ia terpeleset, berguling, dan entah bagaimana pedangnya mengenai ekor makhluk itu. Monster itu kabur sambil menggeram. Iky terengah-engah. 'Catatan: jangan pamer sebelum menang.' Ia tertawa sendiri, lalu melanjutkan perjalanan.",
+
+"PART 4 — Gadis Misterius\n\nDi tepi sungai bercahaya, Iky melihat seorang wanita berambut gelap dengan mata setenang malam. Ia sedang menenangkan monster kecil seperti kucing bersayap. Saat mereka bertatapan, pedang Iky langsung terangkat refleks. 'Tenang,' kata wanita itu, 'dia cuma lapar.' Begitulah Iky bertemu Hany—wanita tangguh yang tinggal di hutan sejak kecil dan mengenal setiap jalannya seperti telapak tangan sendiri.",
+
+"PART 5 — Rekan yang Tak Terduga\n\nAwalnya Iky tidak percaya. Siapa pun yang tinggal di hutan seperti ini pasti gila—atau sangat berbahaya. Namun Hany tertawa saat Iky jatuh ke lumpur dan menawarinya tangan. 'Kamu tidak tahu arah, Petualang. Kalau ingin hidup, ikut aku.' Dengan berat hati dan perut keroncongan, Iky setuju. Ia tidak tahu, keputusan itu akan mengubah hidupnya.",
+
+"PART 6 — Tawa di Tengah Bahaya\n\nPerjalanan mereka dipenuhi kekacauan lucu. Iky salah mengira jamur beracun sebagai makan malam. Hany tertawa terbahak sampai harus duduk karena lemas. Saat malam tiba, mereka berbagi cerita. Iky tentang istana dan raja yang sekarat. Hany tentang hidup sendirian, berpura-pura kuat padahal sering merasa kesepian. Di bawah cahaya violet, jarak di antara mereka perlahan mencair.",
+
+"PART 7 — Bayangan Masa Lalu\n\nDi sebuah reruntuhan, mereka diserang makhluk bayangan. Hany bertarung dengan gesit, namun Iky melihat tangannya gemetar setelahnya. Saat ditanya, Hany mengaku: 'Aku terlihat kuat, tapi sebenarnya aku sering takut.' Iky terdiam. 'Tidak apa-apa. Aku juga sering takut. Bedanya, aku biasanya lari.' Mereka tertawa, dan ketegangan berubah menjadi kehangatan.",
+
+"PART 8 — Jantung Hutan\n\nSemakin ke dalam, hutan terasa hidup. Pohon berbisik, tanah berdenyut, langit berputar seperti pusaran cahaya. Mereka tahu Ramuan Aethel sudah dekat. Namun penjaganya muncul: monster raksasa dengan sayap kristal. Iky ingin menyerang, tapi Hany menahannya. 'Kita hadapi bersama.' Untuk pertama kalinya, Iky tidak merasa sendirian.",
+
+"PART 9 — Pertarungan Terakhir\n\nPertarungan itu brutal dan kacau. Iky terlempar, Hany hampir terjatuh ke jurang. Dengan teriakan putus asa, Iky melompat dan menariknya. Mereka jatuh berguling, tertawa histeris karena masih hidup. Dengan kerja sama, mereka mengalihkan monster dan mengambil ramuan. Cahaya memenuhi hutan, seolah mengakui keberanian mereka.",
+
+"PART 10 — Pengakuan\n\nDi bawah pohon bercahaya, Hany berkata pelan, 'Aku tidak ingin kembali sendirian.' Iky merasakan dadanya hangat. 'Aku juga. Mungkin... aku menemukan alasan lain untuk pulang.' Mereka saling menatap, dan dunia terasa sunyi hanya untuk mereka berdua.",
+
+"PART 11 — Pulang sebagai Pahlawan\n\nSaat kembali ke istana, raja diselamatkan. Kerajaan bersorak, namun Iky hanya mencari satu wajah. Hany berdiri di gerbang, tersenyum. Ia bukan lagi gadis hutan yang sendirian—ia adalah bagian dari hidup Iky.",
+
+"ENDING — Cinta Sejati\n\nMereka memilih berpetualang bersama. Bukan lagi demi raja atau hadiah, melainkan demi dunia yang luas dan tawa yang tak pernah habis. Di setiap langkah, di setiap bahaya, mereka saling menggenggam. Di hutan penuh monster, mereka menemukan cinta sejati."
+
+];
+let i=0;
+const box=document.getElementById("story");
+const bgm=document.getElementById("bgm");
+function render(){ box.innerText = parts[i]; burst(); }
+function next(){ i=(i+1)%parts.length; render(); }
+function prev(){ i=(i-1+parts.length)%parts.length; render(); }
+function loadMusic(input){
+  const file=input.files[0];
+  if(file){ bgm.src=URL.createObjectURL(file); bgm.play(); }
+}
+function burst(){
+  const wrap=document.getElementById("hearts");
+  for(let k=0;k<6;k++){
+    const s=document.createElement("div");
+    s.className="heart"; s.textContent="💗";
+    s.style.left=Math.random()*100+"%";
+    s.style.animationDuration=4+Math.random()*3+"s";
+    wrap.appendChild(s);
+    setTimeout(()=>s.remove(),7000);
+  }
+}
+render();
+</script>
+</body>
+</html>
