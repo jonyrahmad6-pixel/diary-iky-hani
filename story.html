@@ -3,269 +3,359 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iky & Hany — Violet Adventure</title>
+<title>KKN Desa Keramat</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Poppins,sans-serif
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow:hidden}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  max-width:900px;margin:20px auto;padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
 }
 
-body{
-  min-height:100vh;
-  color:white;
-  overflow-y:auto;
-  background:
-    radial-gradient(1200px 600px at 15% 10%, rgba(123,92,255,.35), transparent 60%),
-    radial-gradient(900px 500px at 85% 25%, rgba(255,126,179,.25), transparent 60%),
-    linear-gradient(135deg,#2b1055,#4b2a8a,#7b5cff);
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:20px 0;
-}
-
-.fog{
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle,rgba(255,255,255,.08),transparent 60%);
-  filter:blur(30px);
-  animation:fog 10s infinite alternate;
-  pointer-events:none
-}
-@keyframes fog{to{transform:scale(1.1)}}
-
-.card{
-  width:95%;
-  max-width:900px;
-  padding:25px;
-  border-radius:25px;
-  background:rgba(255,255,255,.12);
-  backdrop-filter:blur(12px);
-  box-shadow:0 30px 80px rgba(0,0,0,.45);
-  text-align:center;
-  position:relative;
-  max-height:90vh;
-  overflow:hidden;
-}
-
-h1{
-  font-size:2.5rem;
-  margin-bottom:5px
-}
-
-.scene{
-  display:flex;
-  justify-content:center;
-  gap:30px;
-  margin:20px 0;
-  flex-wrap:wrap
-}
-
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.charRow{display:flex;align-items:center;gap:14px}
+.charBox{text-align:center;width:78px}
 .char{
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:2.8rem;
-  font-weight:bold;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,.4),
-    inset 0 10px 20px rgba(255,255,255,.35);
-  animation:
-    float 4s ease-in-out infinite,
-    glow 3s ease-in-out infinite alternate;
+  width:78px;height:78px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;box-shadow:0 10px 25px rgba(0,0,0,.5)
 }
+.charName{font-size:.7rem;opacity:.75;margin-top:4px;letter-spacing:.5px}
 
 .bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
 .panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
 
-@keyframes float{50%{transform:translateY(-10px)}}
-@keyframes glow{to{box-shadow:0 0 30px #ff7eb3, 0 20px 40px rgba(0,0,0,.4)}}
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:14px;padding:12px 14px;
+  line-height:1.6;opacity:0;transform:translateY(6px);
+  transition:.4s ease
+}
+.bubble.show{opacity:1;transform:translateY(0)}
 
-.name{
-  margin-top:8px;
-  font-weight:600
+/* CONTROLS */
+.controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+button,label{
+  padding:8px 16px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer
 }
+label{font-size:.8rem}
 
-.controls{
-  margin-top:12px;
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
 }
-
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:999px;
-  background:#ff7eb3;
-  color:white;
-  font-weight:bold;
-  cursor:pointer
-}
-button.alt{background:#7b5cff}
-
-#story{
-  margin-top:15px;
-  background:rgba(255,255,255,.1);
-  border-radius:16px;
-  padding:16px;
-  line-height:1.7;
-  animation:fade .5s;
-  max-height:40vh;
-  overflow-y:auto;
-  text-align:left;
-}
-
-#story::-webkit-scrollbar{
-  width:6px
-}
-#story::-webkit-scrollbar-thumb{
-  background:#ff7eb3;
-  border-radius:10px
-}
-
-@keyframes fade{from{opacity:0}to{opacity:1}}
-
-.hearts{
-  position:absolute;
-  inset:0;
-  pointer-events:none
-}
-.heart{
-  position:absolute;
-  bottom:-20px;
-  animation:rise 6s linear infinite;
-  opacity:.8
-}
-@keyframes rise{
-  to{
-    transform:translateY(-120vh);
-    opacity:0
-  }
-}
-
-/* RESPONSIVE HP */
-@media (max-width:600px){
-  h1{font-size:1.8rem}
-  .char{
-    width:120px;
-    height:120px;
-    font-size:2.2rem
-  }
-  #story{
-    font-size:.9rem;
-    max-height:45vh
-  }
-  button{
-    padding:8px 16px;
-    font-size:.85rem
-  }
-}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
 </style>
 </head>
 
 <body>
-<div class="fog"></div>
 
-<div class="card">
-  <h1>💜 Iky & Hany 💜</h1>
-  <div>Kisah Petualangan di Dunia Violet</div>
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 KKN Desa Keramat 🌑</h2>
 
   <div class="scene">
-    <div>
-      <div class="char bear">🐻</div>
-      <div class="name">Iky</div>
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
     </div>
-    <div>
-      <div class="char panda">🐼</div>
-      <div class="name">Hany</div>
+
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
     </div>
   </div>
 
   <div class="controls">
-    <button onclick="prev()">⟵</button>
-    <button class="alt" onclick="next()">⟶</button>
-    <label class="alt" style="padding:10px 20px;border-radius:999px;cursor:pointer;">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
       🎵 Pilih Musik
       <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
     </label>
-  </div>
 
-  <div id="story"></div>
-  <div class="hearts" id="hearts"></div>
-  <audio id="bgm" loop></audio>
+    <button onclick="nextPart()">⟶</button>
+  </div>
 </div>
 
+<audio id="bgm" loop></audio>
+
 <script>
-const parts = [
-
-"PART 1 — Petualang dari Utara\n\nIky dikenal sebagai petualang paling keras kepala di Kerajaan Auralis. Ia bukan pangeran, bukan ksatria berdarah bangsawan, hanya seorang pemuda dengan mantel cokelat lusuh dan pedang yang sudah lebih sering tergores daripada dipuji. Namun satu hal membuat namanya terkenal: ia selalu kembali hidup dari Hutan Violet, tempat yang dipenuhi monster dan kutukan. Suatu pagi, lonceng istana berdentang memanggilnya. Sang raja terbaring lemah, diracuni makhluk gelap. Satu-satunya obat hanyalah Ramuan Aethel, tumbuh di jantung hutan paling berbahaya di dunia.",
-
-"PART 2 — Misi yang Mustahil\n\nTabib kerajaan berkata ramuan itu dijaga oleh makhluk kuno yang tidak pernah membiarkan manusia mendekat. Banyak yang gagal, tak satu pun kembali. Iky menelan ludah, lalu tersenyum kecil. 'Kalau tidak ada yang kembali, berarti belum ada yang mencoba sekeras aku.' Dengan bekal seadanya dan perut yang sudah lapar sebelum berangkat, ia melangkah ke gerbang hutan. Udara berubah dingin, pepohonan berkilau ungu, dan suara yang bukan milik dunia manusia mulai terdengar.",
-
-"PART 3 — Monster Pertama\n\nBaru beberapa jam berjalan, tanah di depannya retak. Dari bawah muncul makhluk seperti serigala batu bermata merah. Iky berteriak setengah panik, setengah sok berani. Ia terpeleset, berguling, dan entah bagaimana pedangnya mengenai ekor makhluk itu. Monster itu kabur sambil menggeram. Iky terengah-engah. 'Catatan: jangan pamer sebelum menang.' Ia tertawa sendiri, lalu melanjutkan perjalanan.",
-
-"PART 4 — Gadis Misterius\n\nDi tepi sungai bercahaya, Iky melihat seorang wanita berambut gelap dengan mata setenang malam. Ia sedang menenangkan monster kecil seperti kucing bersayap. Saat mereka bertatapan, pedang Iky langsung terangkat refleks. 'Tenang,' kata wanita itu, 'dia cuma lapar.' Begitulah Iky bertemu Hany—wanita tangguh yang tinggal di hutan sejak kecil dan mengenal setiap jalannya seperti telapak tangan sendiri.",
-
-"PART 5 — Rekan yang Tak Terduga\n\nAwalnya Iky tidak percaya. Siapa pun yang tinggal di hutan seperti ini pasti gila—atau sangat berbahaya. Namun Hany tertawa saat Iky jatuh ke lumpur dan menawarinya tangan. 'Kamu tidak tahu arah, Petualang. Kalau ingin hidup, ikut aku.' Dengan berat hati dan perut keroncongan, Iky setuju. Ia tidak tahu, keputusan itu akan mengubah hidupnya.",
-
-"PART 6 — Tawa di Tengah Bahaya\n\nPerjalanan mereka dipenuhi kekacauan lucu. Iky salah mengira jamur beracun sebagai makan malam. Hany tertawa terbahak sampai harus duduk karena lemas. Saat malam tiba, mereka berbagi cerita. Iky tentang istana dan raja yang sekarat. Hany tentang hidup sendirian, berpura-pura kuat padahal sering merasa kesepian. Di bawah cahaya violet, jarak di antara mereka perlahan mencair.",
-
-"PART 7 — Bayangan Masa Lalu\n\nDi sebuah reruntuhan, mereka diserang makhluk bayangan. Hany bertarung dengan gesit, namun Iky melihat tangannya gemetar setelahnya. Saat ditanya, Hany mengaku: 'Aku terlihat kuat, tapi sebenarnya aku sering takut.' Iky terdiam. 'Tidak apa-apa. Aku juga sering takut. Bedanya, aku biasanya lari.' Mereka tertawa, dan ketegangan berubah menjadi kehangatan.",
-
-"PART 8 — Jantung Hutan\n\nSemakin ke dalam, hutan terasa hidup. Pohon berbisik, tanah berdenyut, langit berputar seperti pusaran cahaya. Mereka tahu Ramuan Aethel sudah dekat. Namun penjaganya muncul: monster raksasa dengan sayap kristal. Iky ingin menyerang, tapi Hany menahannya. 'Kita hadapi bersama.' Untuk pertama kalinya, Iky tidak merasa sendirian.",
-
-"PART 9 — Pertarungan Terakhir\n\nPertarungan itu brutal dan kacau. Iky terlempar, Hany hampir terjatuh ke jurang. Dengan teriakan putus asa, Iky melompat dan menariknya. Mereka jatuh berguling, tertawa histeris karena masih hidup. Dengan kerja sama, mereka mengalihkan monster dan mengambil ramuan. Cahaya memenuhi hutan, seolah mengakui keberanian mereka.",
-
-"PART 10 — Pengakuan\n\nDi bawah pohon bercahaya, Hany berkata pelan, 'Aku tidak ingin kembali sendirian.' Iky merasakan dadanya hangat. 'Aku juga. Mungkin... aku menemukan alasan lain untuk pulang.' Mereka saling menatap, dan dunia terasa sunyi hanya untuk mereka berdua.",
-
-"PART 11 — Pulang sebagai Pahlawan\n\nSaat kembali ke istana, raja diselamatkan. Kerajaan bersorak, namun Iky hanya mencari satu wajah. Hany berdiri di gerbang, tersenyum. Ia bukan lagi gadis hutan yang sendirian—ia adalah bagian dari hidup Iky.",
-
-"ENDING — Cinta Sejati\n\nMereka memilih berpetualang bersama. Bukan lagi demi raja atau hadiah, melainkan demi dunia yang luas dan tawa yang tak pernah habis. Di setiap langkah, di setiap bahaya, mereka saling menggenggam. Di hutan penuh monster, mereka menemukan cinta sejati."
-
-];
-let i=0;
-const box=document.getElementById("story");
+/* ========= MUSIK ========= */
 const bgm=document.getElementById("bgm");
-
-function render(){
-  box.innerText=parts[i];
-  box.scrollTop=0;
-  burst();
-}
-function next(){i=(i+1)%parts.length;render()}
-function prev(){i=(i-1+parts.length)%parts.length;render()}
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
 
 function loadMusic(input){
   const file=input.files[0];
-  if(file){
-    bgm.src=URL.createObjectURL(file);
-    bgm.play();
-  }
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
 }
 
-function burst(){
-  const wrap=document.getElementById("hearts");
-  for(let k=0;k<6;k++){
-    const s=document.createElement("div");
-    s.className="heart";
-    s.textContent="💗";
-    s.style.left=Math.random()*100+"%";
-    s.style.animationDuration=4+Math.random()*3+"s";
-    wrap.appendChild(s);
-    setTimeout(()=>s.remove(),7000);
+/* ========= CERITA ========= */
+const parts = [
+
+/* =========================
+PART 1 — AWAL KKN
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+lines:[
+{char:"iky",text:"Akhirnya sampai juga. Desa Wamere… pedalaman Papua. Fokus kita jelas. KKN sukses, tidak ada drama. 🐻"},
+{char:"andi",text:"Iky… lo yakin tempat ini aman? Dari tadi warga cuma diam liatin kita. 🦁"},
+{char:"ogif",text:"Santai aja, mungkin mereka kagum lihat ketampanan kita. 🦊"},
+{char:"hany",text:"Aku… cuma merasa hawanya beda. Kayak terlalu sunyi. 🐼"},
+{char:"iky",text:"Logis sedikit. Kita jauh dari kota. Wajar kalau sepi. 🐻"},
+{char:"andi",text:"Sepi iya… tapi jangan sampai ada yang tiba-tiba manggil dari hutan ya. 🦁"},
+{char:"ogif",text:"Kalau ada yang manggil nama lo, aku kabur duluan. 🦊"}
+]
+},
+
+/* =========================
+PART 2 — MALAM PERTAMA
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"hany",text:"Tadi kepala desa bilang jangan keluar setelah jam sembilan malam. 🐼"},
+{char:"ogif",text:"Kenapa? Ada diskon hantu jam sepuluh? 🦊"}, 
+{char:"andi",text:"Jangan bercanda Gif. Katanya hutan sebelah kampung itu keramat. 🦁"},
+{char:"iky",text:"Mitos seperti itu biasa dipakai untuk jaga wilayah adat. 🐻"},
+{char:"andi",text:"Atau… buat nutupin sesuatu. 🦁"}
+]
+},
+
+/* =========================
+PART 3 — MALAM GELAP
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1476610182048-b716b8518aae",
+lines:[
+{char:"ogif",text:"Listriknya mati. Bagus banget… 😨 🦊"},
+{char:"hany",text:"Aku nggak suka gelap… 🐼"},
+{char:"andi",text:"Dengar nggak? Kayak ada yang jalan di luar. 🦁"},
+{char:"iky",text:"Tetap di dalam. Jangan panik. 🐻"},
+{char:"ogif",text:"Kalau itu bukan manusia gimana… 😱 🦊"}
+]
+},
+
+/* =========================
+PART 4 — SUARA HUTAN
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"andi",text:"Suara tangisan itu… dari arah hutan. 🦁"},
+{char:"hany",text:"Jangan bilang kita harus cek… 🐼"},
+{char:"iky",text:"Aku cek sendiri. Kalian di sini. 🐻"},
+{char:"ogif",text:"Pemimpin sejati nih ceritanya… 😏 🦊"}
+]
+},
+
+/* =========================
+PART 5 — PENGAKUAN DAN TEKA-TEKI
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1503437313881-503a91226402",
+lines:[
+{char:"andi",text:"Iky… kalau sesuatu terjadi… aku cuma mau bilang aku percaya sama lo. 🦁"},
+{char:"iky",text:"Kita keluar dari sini bareng. 🐻"},
+{char:"ogif",text:"Eh jangan romantis dulu, aku masih jomblo 😅 🦊"},
+{char:"hany",text:"Fokus dong! 🐼"}
+]
+},
+
+/* =========================
+PART 6 — PENEMUAN UKIRAN
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+lines:[
+{char:"iky",text:"Aku nemu ukiran di pohon. Ada nama kita. 🐻"},
+{char:"andi",text:"Nama kita? Sejak kapan? 🦁"},
+{char:"hany",text:"Aku mau pulang… 🐼"},
+{char:"ogif",text:"Ini nggak lucu lagi… 😰 🦊"}
+]
+},
+
+/* =========================
+PART 7 — SEGEL TERBUKA
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1499346030926-9a72daac6c63",
+lines:[
+{char:"ogif",text:"Aku cuma buka kain merah itu sebentar… 🦊"},
+{char:"iky",text:"KAMU APAKAN?! 😡 🐻"},
+{char:"andi",text:"Itu sesajen Gif! 🦁"},
+{char:"hany",text:"Sejak itu… aku merasa ada yang ikut masuk ke rumah. 🐼"}
+]
+},
+
+/* =========================
+PART 8 — TEROR DIMULAI
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+lines:[
+{char:"andi",text:"Dia berdiri di belakang Iky tadi… 🦁"},
+{char:"iky",text:"Siapa?! 😱 🐻"}, 
+{char:"hany",text:"Perempuan… rambut panjang… tanpa wajah. 🐼"},
+{char:"ogif",text:"Oke kita mati. 😨 🦊"}
+]
+},
+
+/* =========================
+PART 9 — ROMANCE SINGKAT
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"andi",text:"Aku takut… tapi kalau bareng kamu aku lebih tenang. 🦁"},
+{char:"iky",text:"Aku nggak akan biarin siapapun nyentuh kamu. 🐻"},
+{char:"ogif",text:"Aduh makin kayak film. 😅 🦊"},
+{char:"hany",text:"Semoga kita semua selamat… 🐼"}
+]
+},
+
+/* =========================
+PART 10 — TRAGEDI
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"ogif",text:"Dia… narik aku… dari bawah lantai! 😨 🦊"},
+{char:"hany",text:"OGIF PEGANG TANGANKU! 🐼"},
+{char:"andi",text:"Iky lakukan sesuatu! 🦁"},
+{char:"iky",text:"TIDAK!!! 😭 🐻"}
+]
+}
+
+];
+
+let p=0,l=0;
+
+/* ========= EFFECT ========= */
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
   }
 }
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+/* ========= VN ========= */
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },45);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p].lines[l];
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(mood(line.text)){rain(true);jumpscare()} else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
 
 render();
 </script>
+
 </body>
 </html>
