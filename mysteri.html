@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mysteri Pembunuhan Berantai</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow-y:auto;min-height:100vh;}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  width:95%;
+  max-width:900px;
+  margin:20px auto;
+  padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite;
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.charRow{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.charBox{text-align:center;width:60px;flex-shrink:0;}
+.char{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:0 8px 20px rgba(0,0,0,.5)
+}
+.charName{font-size:.65rem;opacity:.75;margin-top:3px;letter-spacing:.5px}
+
+/* Karakter warna */
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.ghost{background:linear-gradient(145deg,#555,#222)}
+
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:12px;padding:10px 12px;
+  line-height:1.5;opacity:0;transform:translateY(4px);
+  transition:.4s ease;
+  word-break:break-word;
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+button,label{
+  padding:6px 14px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer;font-size:.85rem
+}
+
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
+}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
+
+/* GRAYSCALE */
+.grayscale{filter:grayscale(100%)}
+
+/* Responsif HP */
+@media(max-width:600px){
+  .charBox{width:50px;}
+  .char{width:50px;height:50px;font-size:1.5rem;}
+  .bubble{font-size:.85rem;padding:8px 10px;}
+  .controls{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 Mysteri Pembunuhan Berantai 🌑</h2>
+
+  <div class="scene">
+
+    <!-- IKY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
+    </div>
+
+    <!-- ANDI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <!-- HANY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <!-- OGIF -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
+    </div>
+
+    <!-- NO NAME -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char wolf" id="tetuaChar">🐺</div>
+        <div class="charName">NO NAME</div>
+      </div>
+      <div class="bubble" id="nonameBubble"></div>
+    </div>
+
+    <!-- WARGA -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char ghost" id="suanggiChar">🙋🏻‍♂️</div>
+        <div class="charName">WARGA</div>
+      </div>
+      <div class="bubble" id="wargaBubble"></div>
+    </div>
+
+    <!-- NARRATOR -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char" id="narratorChar">📝</div>
+        <div class="charName">NARRATOR</div>
+      </div>
+      <div class="bubble" id="narratorBubble"></div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+
+    <button onclick="nextPart()">⟶</button>
+  </div>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<script>
+const bgm=document.getElementById("bgm");
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
+
+function loadMusic(input){
+  const file=input.files[0];
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
+}
+
+const parts=[
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Kota itu terlihat normal. Lampu jalan menyala. Orang-orang pulang kerja. Tidak ada yang menyangka bahwa dalam 3 bulan terakhir… 10 orang telah dibunuh."},
+{char:"narrator",text:"3 anak kecil. 4 perempuan dewasa. 3 pria dewasa. Tidak ada pola yang jelas. Tidak ada saksi. Tidak ada sidik jari."},
+{char:"andi",text:"Kita tidak punya apa-apa selain simbol aneh itu."},
+{char:"ogif",text:"Dan semua TKP selalu bersih. Terlalu bersih."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"iky",text:"Simbol ini bukan acak."},
+{char:"hany",text:"Kamu lihat dari mana sih, Ky? Itu cuma coretan aneh."},
+{char:"iky",text:"Bukan. Itu pola angka."},
+{char:"hany",text:"Kamu jangan ikut-ikut campur kasus polisi ya… aku nggak tenang."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"andi",text:"Mahasiswa hukum mau ngajarin polisi kerja?"}, 
+{char:"iky",text:"Saya cuma bilang ada pola angka 3-4-3."},
+{char:"ogif",text:"Tunggu… korban juga 3 anak, 4 perempuan, 3 pria."},
+{char:"andi",text:"Kebetulan."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"narrator",text:"Korban ke-11 belum muncul. Tapi semua orang tahu… itu hanya soal waktu."},
+{char:"hany",text:"Ky, kamu berhenti ya. Ini bukan skripsi kamu."},
+{char:"iky",text:"Justru karena hukum sering gagal… kita harus lihat dari sudut lain."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"warga",text:"Saya lihat laki-laki biasa saja malam itu. Tidak mencurigakan."},
+{char:"andi",text:"Biasa seperti apa?"}, 
+{char:"warga",text:"Ya… seperti orang lewat biasa."},
+{char:"narrator",text:"Pembunuhnya tidak menonjol. Itu yang membuatnya berbahaya."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+lines:[
+{char:"iky",text:"Angka 3-4-3 bukan cuma jumlah korban."},
+{char:"ogif",text:"Maksudnya?"}, 
+{char:"iky",text:"Itu membentuk kode halaman dalam KUHP."},
+{char:"andi",text:"Jangan bercanda."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Pasal yang ditunjuk angka itu berbicara tentang kelalaian yang menyebabkan kematian."},
+{char:"hany",text:"Kelalaian?"},
+{char:"iky",text:"Ini bukan pembunuhan acak. Ini pesan."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"noname",text:"Kamu pintar, Iky."},
+{char:"noname",text:"Tapi belum cukup cepat."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"andi",text:"Korban ke-11 ditemukan tadi pagi."},
+{char:"hany",text:"Ya Tuhan…"},
+{char:"ogif",text:"Masih anak kecil."},
+{char:"iky",text:"Dia mengubah polanya."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"iky",text:"Tidak… dia bukan ubah pola. Dia mempercepat."},
+{char:"andi",text:"Apa maksudmu?"}, 
+{char:"iky",text:"Dia tahu kita mulai memahami."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"hany",text:"Kamu pikir dia tahu tentang kamu?"}, 
+{char:"iky",text:"Aku yakin."},
+{char:"narrator",text:"Untuk pertama kalinya… Iky merasa sedang diawasi."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"ogif",text:"Korban pertama… belum benar-benar mati."},
+{char:"andi",text:"Apa?"}, 
+{char:"ogif",text:"Dia koma. Rumah sakit merahasiakan."},
+{char:"iky",text:"Itu saksi hidup."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Jika korban pertama sadar… pola akan terungkap."},
+{char:"noname",text:"Bangunlah… dan hancurkan permainanku."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"hany",text:"Aku takut, Ky."},
+{char:"iky",text:"Aku nggak akan kenapa-kenapa."},
+{char:"hany",text:"Itu bukan yang aku takutkan… aku takut kehilangan kamu."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"andi",text:"Kalau kamu ikut campur lagi, saya tangkap kamu."},
+{char:"iky",text:"Kalau saya benar?"}, 
+{char:"andi",text:"Kalau kamu benar… saya dengar."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+lines:[
+{char:"iky",text:"Semua korban lahir di tanggal yang membentuk deret Fibonacci."},
+{char:"ogif",text:"Itu… tidak mungkin kebetulan."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Semakin dekat mereka ke jawaban… semakin cepat korban jatuh."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"noname",text:"Bagus sekali, Iky."},
+{char:"noname",text:"Sekarang giliranmu."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"hany",text:"Apa maksudnya giliranmu?"}, 
+{char:"iky",text:"Dia tidak membunuh sembarang orang."},
+{char:"iky",text:"Dia sedang menyusun pesan untukku."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"narrator",text:"Dan untuk pertama kalinya… pembunuh itu tersenyum."},
+{char:"noname",text:"Permainan baru saja dimulai."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Dua hari kemudian… korban pertama akhirnya membuka mata."},
+{char:"ogif",text:"Dia sadar."},
+{char:"andi",text:"Semua tim siaga. Jangan ada kebocoran."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"iky",text:"Aku harus bicara dengannya."},
+{char:"andi",text:"Tidak. Ini wilayah polisi."},
+{char:"iky",text:"Kalau dia menyebut sesuatu yang tidak kalian pahami?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"hany",text:"Ky jangan keras kepala terus…"},
+{char:"iky",text:"Aku cuma ingin menghentikan ini."},
+{char:"hany",text:"Dengan mengorbankan diri kamu sendiri?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"narrator",text:"Di ruang ICU yang sunyi… korban itu berbisik."},
+{char:"warga",text:"Dia… bukan orang asing…"},
+{char:"andi",text:"Siapa? Siapa dia?"},
+{char:"warga",text:"Dia… terlihat biasa…"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"warga",text:"Dia menyebut nama… I…"},
+{char:"hany",text:"I? I siapa?"},
+{char:"iky",text:"Lanjutkan… tolong."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"warga",text:"Iky…"},
+{char:"andi",text:"Apa?"},
+{char:"hany",text:"Tidak mungkin!"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"Ruangan membeku."},
+{char:"andi",text:"Penjelasan. Sekarang."},
+{char:"iky",text:"Saya tidak pernah bertemu dia."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+lines:[
+{char:"ogif",text:"Andi… bisa jadi korban salah dengar."},
+{char:"andi",text:"Atau kita duduk bersama pelakunya."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Di tempat lain… seseorang tersenyum membaca berita itu."},
+{char:"noname",text:"Bagaimana rasanya dituduh, Iky?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"hany",text:"Aku percaya kamu."},
+{char:"iky",text:"Tapi polisi tidak."},
+{char:"hany",text:"Biar aku yang buktiin kalau kamu nggak salah."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"iky",text:"Korban bilang 'Iky'… tapi bisa saja itu bagian dari rencana."},
+{char:"ogif",text:"Maksudmu kamu dipancing?"},
+{char:"iky",text:"Ya. Dia sengaja menarikku masuk."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"andi",text:"Semua jejak digital kamu kami cek."},
+{char:"iky",text:"Silakan."},
+{char:"andi",text:"Kalau kamu bersih… aku minta maaf."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"narrator",text:"Tidak ada bukti langsung terhadap Iky."},
+{char:"ogif",text:"Semua alibinya cocok."},
+{char:"andi",text:"Terlalu cocok."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"noname",text:"Bagus. Sekarang kamu semakin dekat."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1478146896981-b80fe463b330",
+lines:[
+{char:"iky",text:"Coba lihat lagi simbol terakhir."},
+{char:"hany",text:"Ada yang beda?"},
+{char:"iky",text:"Ada huruf tersembunyi di pola darahnya."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"ogif",text:"Huruf apa?"},
+{char:"iky",text:"H."},
+{char:"hany",text:"H?"},
+{char:"andi",text:"H untuk apa?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"narrator",text:"Semua mata perlahan beralih ke satu orang."},
+{char:"hany",text:"Kalian lihat aku kenapa?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"iky",text:"Bukan… bukan kamu."},
+{char:"iky",text:"Dia ingin kita saling curiga."}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"noname",text:"Curiga itu indah… bukan?"}
+]
+},
+
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"Dan malam itu… korban ke-12 ditemukan."},
+{char:"narrator",text:"Di sakunya… terdapat foto Iky."}
+]
+}
+
+]; // nanti isi cerita bisa dilanjutkan
+
+let p=0,l=0;
+
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
+  }
+}
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },50);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p]?.lines[l];
+  if(!line) return;
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(!bubble) return;
+  if(mood(line.text)){
+    rain(true);
+    jumpscare();
+    if(line.char=="suanggi"){ setTimeout(()=>{jumpscare()},300); }
+  } else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  if(parts[p]) document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
+
+render();
+</script>
+</body>
+</html>
+
