@@ -52,6 +52,7 @@ body{background:#0f061a;color:white;overflow:hidden}
 .lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
 .panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
 .fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
 
 .bubble{
   flex:1;background:rgba(0,0,0,.35);
@@ -88,39 +89,54 @@ label{font-size:.8rem}
 <div id="app">
   <h2 style="text-align:center">🌑 KKN Desa Keramat 🌑</h2>
 
-  <div class="scene">
-    <div class="charRow">
-      <div class="charBox">
-        <div class="char bear" id="ikyChar">🐻</div>
-        <div class="charName">IKY</div>
-      </div>
-      <div class="bubble" id="ikyBubble"></div>
-    </div>
+<div class="scene">
 
-    <div class="charRow">
-      <div class="charBox">
-        <div class="char lion" id="andiChar">🦁</div>
-        <div class="charName">ANDI</div>
-      </div>
-      <div class="bubble" id="andiBubble"></div>
+  <!-- IKY -->
+  <div class="charRow">
+    <div class="charBox">
+      <div class="char bear">🐻</div>
+      <div class="charName">IKY</div>
     </div>
-
-    <div class="charRow">
-      <div class="charBox">
-        <div class="char panda" id="hanyChar">🐼</div>
-        <div class="charName">HANY</div>
-      </div>
-      <div class="bubble" id="hanyBubble"></div>
-    </div>
-
-    <div class="charRow">
-      <div class="charBox">
-        <div class="char fox" id="ogifChar">🦊</div>
-        <div class="charName">OGIF</div>
-      </div>
-      <div class="bubble" id="ogifBubble"></div>
-    </div>
+    <div class="bubble" id="ikyBubble"></div>
   </div>
+
+  <!-- ANDI -->
+  <div class="charRow">
+    <div class="charBox">
+      <div class="char lion">🦁</div>
+      <div class="charName">ANDI</div>
+    </div>
+    <div class="bubble" id="andiBubble"></div>
+  </div>
+
+  <!-- HANY -->
+  <div class="charRow">
+    <div class="charBox">
+      <div class="char panda">🐼</div>
+      <div class="charName">HANY</div>
+    </div>
+    <div class="bubble" id="hanyBubble"></div>
+  </div>
+
+  <!-- OGIF -->
+  <div class="charRow">
+    <div class="charBox">
+      <div class="char fox">🦊</div>
+      <div class="charName">OGIF</div>
+    </div>
+    <div class="bubble" id="ogifBubble"></div>
+  </div>
+
+  <!-- TETUA -->
+  <div class="charRow">
+    <div class="charBox">
+      <div class="char wolf">🐺</div>
+      <div class="charName">TETUA</div>
+    </div>
+    <div class="bubble" id="tetuaBubble"></div>
+  </div>
+
+</div>
 
   <div class="controls">
     <button onclick="prevPart()">⟵</button>
@@ -154,132 +170,223 @@ function loadMusic(input){
 /* ========= CERITA ========= */
 const parts = [
 /* =========================
-PART 11 — DARAH DI TANAH
+PART 21 — DESA YANG TERLALU DIAM
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"hany",text:"🐼 Tanahnya… merah. Ini darah ya…?"}, 
-  {char:"andi",text:"🦁 Bukan cuma darah… ini lingkaran ritual."},
-  {char:"ogif",text:"🦊 Jangan bilang kita berdiri di tengahnya…"},
-  {char:"iky",text:"🐻 Ini bukan kebetulan. Kita memang dipanggil ke sini."}
+{char:"ogif",text:"Kenapa ya… sejak tadi warga kayak menghindari kita?"}, 
+{char:"andi",text:"Bukan menghindari. Mereka… mengawasi."},
+{char:"hany",text:"Aku nggak suka tatapan mereka. Kayak kita bukan tamu… tapi tamu yang salah alamat."},
+{char:"iky",text:"Tenang. Kita tetap jalankan program. Jangan terpancing suasana."},
+{char:"andi",text:"Ik… lo nggak ngerasa udara di sini makin berat tiap sore?"}
 ]
 },
 
 /* =========================
-PART 12 — BISIKAN HUJAN
+PART 22 — MIMPI IKY
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"andi",text:"🦁 Dengar… hujan mulai turun."},
-  {char:"hany",text:"🐼 Suaranya seperti… ada yang berbisik di antara tetesannya…"},
-  {char:"ogif",text:"🦊 Jangan sugesti aku dong!"},
-  {char:"iky",text:"🐻 Itu bukan hujan biasa. Itu pertanda."}
+{char:"iky",text:"Semalam aku mimpi aneh."},
+{char:"hany",text:"Mimpi apa? Kamu kelihatan pucat 😟"},
+{char:"iky",text:"Aku berdiri di tengah hutan. Hujan deras. Ada perempuan pakai mahkota bulu… tapi wajahnya kosong."},
+{char:"andi",text:"Mahkota bulu? Itu atribut ritual Papua lama."},
+{char:"ogif",text:"Oke fix, kita lagi nggak main-main sekarang."},
+{char:"iky",text:"Yang aneh… dia bilang namaku."}
 ]
 },
 
 /* =========================
-PART 13 — ANDI & OGIF
+PART 23 — ANDI & OGIF
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"andi",text:"🦁 Gif, jangan jauh dari aku. Aku jagain kamu."},
-  {char:"ogif",text:"🦊 Aku bisa jaga diri sendiri, Andi."},
-  {char:"andi",text:"🦁 Aku cuma nggak mau kamu kenapa-kenapa."},
-  {char:"ogif",text:"🦊 Justru kamu bikin aku makin takut… terlalu posesif."}
+{char:"andi",text:"Gif, jangan jauh-jauh dari rumah malam ini."},
+{char:"ogif",text:"Santai aja kali. Aku nggak selemah itu."},
+{char:"andi",text:"Bukan soal lemah. Gue cuma… nggak mau lo kenapa-kenapa."},
+{char:"ogif",text:"Andi, kamu tuh kenapa sih overprotective banget? Aku bisa jaga diri."},
+{char:"andi",text:"Gue cuma khawatir, itu aja."},
+{char:"ogif",text:"Justru itu yang bikin aku risih."}
 ]
 },
 
 /* =========================
-PART 14 — PENGAKUAN HANY
+PART 24 — KETUKAN JAM 3 PAGI
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"hany",text:"🐼 Iky… aku nggak peduli soal desa ini. Aku cuma mau kamu aman."},
-  {char:"iky",text:"🐻 Kamu harus belajar berdiri sendiri, Han."},
-  {char:"hany",text:"🐼 Aku kuat kalau kamu di sampingku…"},
-  {char:"iky",text:"🐻 Justru karena itu kamu harus lebih berani."}
+{char:"hany",text:"Iky… bangun… ada suara ketukan 😰"},
+{char:"iky",text:"Jam berapa sekarang?"},
+{char:"andi",text:"Tiga pagi."},
+{char:"ogif",text:"Jangan buka pintu."},
+{char:"iky",text:"Tenang. Aku cek."},
+{char:"hany",text:"Jangan… tolong jangan tinggalin aku sendiri."}
 ]
 },
 
 /* =========================
-PART 15 — PENAMPAKAN PENUH
+PART 25 — JEJAK DI TANAH BASAH
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"ogif",text:"🦊 Itu dia! Di atas pohon!"}, 
-  {char:"andi",text:"🦁 Rambutnya panjang… wajahnya kosong…"},
-  {char:"hany",text:"🐼 Jangan lihat matanya!"},
-  {char:"iky",text:"🐻 SUANGGI."}
+{char:"iky",text:"Nggak ada siapa-siapa."},
+{char:"andi",text:"Tapi tanahnya basah… padahal tadi nggak hujan."},
+{char:"ogif",text:"Itu… jejak kaki."},
+{char:"hany",text:"Kenapa jejaknya cuma satu… dan berhenti di depan pintu kita?"},
+{char:"iky",text:"Besok kita ke hutan. Aku mau tahu ini semua apa."}
 ]
 },
 
 /* =========================
-PART 16 — KUTUKAN DIPILIH
+PART 26 — TETUA DESA
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"iky",text:"🐻 Dia tidak ingin kita semua."},
-  {char:"andi",text:"🦁 Maksud lo apa?"}, 
-  {char:"iky",text:"🐻 Dia cuma butuh satu jiwa."},
-  {char:"hany",text:"🐼 Jangan bilang… jangan bilang kamu…"}
+{char:"andi",text:"Pak… sebenarnya apa yang terjadi di desa ini?"}, 
+{char:"tetua",text:"Kalian membuka sesuatu yang seharusnya tidak disentuh."},
+{char:"iky",text:"Maksud bapak sesajen merah itu?"},
+{char:"tetua",text:"Itu bukan sesajen biasa. Itu penutup."},
+{char:"hany",text:"Penutup… untuk apa? 😟"},
+{char:"tetua",text:"Untuk Suanggi."}
 ]
 },
 
 /* =========================
-PART 17 — PENGORBANAN MULAI TERLIHAT
+PART 27 — NAMA YANG DILARANG
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"iky",text:"🐻 Kalau satu nyawa bisa menyelamatkan yang lain… aku siap."},
-  {char:"hany",text:"🐼 TIDAK! Jangan ngomong gitu!"},
-  {char:"andi",text:"🦁 Kita cari cara lain!"},
-  {char:"ogif",text:"🦊 Jangan jadi pahlawan sendirian, Ky…"}
+{char:"ogif",text:"Suanggi itu apa? Hantu?"}, 
+{char:"tetua",text:"Bukan sekadar hantu. Ia roh perempuan yang mati tidak wajar. Ia mencuri nyawa lewat ketakutan."},
+{char:"andi",text:"Kenapa dia ganggu kita?"},
+{char:"tetua",text:"Karena salah satu dari kalian sudah dipilih."},
+{char:"hany",text:"Dipilih…?"},
+{char:"tetua",text:"Ia sudah memanggil namanya."}
 ]
 },
 
 /* =========================
-PART 18 — SERANGAN TERAKHIR
+PART 28 — SIAPA YANG DIPILIH
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"hany",text:"🐼 Dia datang! Dari tanah!"}, 
-  {char:"andi",text:"🦁 Gif di belakangku!"}, 
-  {char:"ogif",text:"🦊 Andi awas!"}, 
-  {char:"iky",text:"🐻 SEKARANG! LARI!"}
+{char:"iky",text:"Dia memanggilku dalam mimpi."},
+{char:"hany",text:"Tidak… jangan bilang kamu yang dimaksud 😢"},
+{char:"andi",text:"Kenapa harus Iky?"},
+{char:"tetua",text:"Karena jiwanya paling kuat. Suanggi butuh jiwa kuat untuk bertahan."},
+{char:"ogif",text:"Jadi… dia mau ambil Iky?"}
 ]
 },
 
 /* =========================
-PART 19 — IKY TERTANGKAP
+PART 29 — HUJAN DI SIANG HARI
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"hany",text:"🐼 IKY!!!"}, 
-  {char:"andi",text:"🦁 Dia narik Iky ke tengah lingkaran!"}, 
-  {char:"ogif",text:"🦊 Kita harus tarik dia keluar!"}, 
-  {char:"iky",text:"🐻 Jangan… mendekat…"}
+{char:"hany",text:"Kenapa tiba-tiba hujan? Padahal tadi panas."},
+{char:"andi",text:"Ini bukan hujan biasa."},
+{char:"ogif",text:"Kenapa setiap hujan turun, rasanya kayak ada yang lihat kita?"},
+{char:"iky",text:"Tetap tenang. Jangan tunjukkan ketakutan."},
+{char:"andi",text:"Dia makan rasa takut, kan?"}
 ]
 },
 
 /* =========================
-PART 20 — JANJI DI BAWAH HUJAN
+PART 30 — BAYANGAN DI BALIK POHON
 ========================= */
 {
 bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
 lines:[
-  {char:"iky",text:"🐻 Hany… kamu harus hidup. Jangan bergantung padaku lagi."},
-  {char:"hany",text:"🐼 Aku nggak mau hidup tanpa kamu!"},
-  {char:"iky",text:"🐻 Jadilah wanita pemberani… itu permintaan terakhirku."},
-  {char:"andi",text:"🦁 Hujannya makin deras… ini akhir ritual…"}
+{char:"hany",text:"Ik… di belakang kamu! 😰"},
+{char:"iky",text:"Apa?"},
+{char:"andi",text:"Aku lihat… perempuan berdiri di balik pohon."},
+{char:"ogif",text:"Rambutnya panjang… dan matanya kosong."},
+{char:"iky",text:"Jangan lari! Tetap di sini!"},
+{char:"andi",text:"Dia tersenyum… ke arah kamu."}
+]
+},
+
+/* =========================
+PART 31 — RITUAL PERLINDUNGAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Kita buat lingkaran daun sagu. Jangan ada yang keluar sebelum selesai."},
+{char:"iky",text:"Apa ini benar-benar bisa menghentikannya?"},
+{char:"tetua",text:"Tidak menghentikan. Hanya menunda."},
+{char:"hany",text:"Menunda…? 😰"},
+{char:"andi",text:"Kenapa rasanya udara makin dingin?"},
+{char:"ogif",text:"Aku… nggak bisa gerak."}
+]
+},
+
+/* =========================
+PART 32 — SUARA DALAM OGIF
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"ogif",text:"Dia… ada di sini…"}, 
+{char:"andi",text:"Gif? Lo kenapa suaranya beda?"},
+{char:"ogif",text:"Dia berdiri… di belakang Iky."},
+{char:"hany",text:"Jangan bercanda! 😢"},
+{char:"ogif",text:"Dia bilang… waktunya hampir tiba."},
+{char:"iky",text:"Tetua, ini bagian dari ritual kan?!"}
+]
+},
+
+/* =========================
+PART 33 — RITUAL GAGAL
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Lingkarannya… terputus!"},
+{char:"andi",text:"Anginnya kencang banget!"},
+{char:"hany",text:"Api obornya padam!"},
+{char:"ogif",text:"Aku nggak bisa berhenti lihat dia…"},
+{char:"iky",text:"SEMUA PEGANG TANGAN! Jangan lepas!"},
+{char:"tetua",text:"Dia sudah masuk ke dalam desa."}
+]
+},
+
+/* =========================
+PART 34 — ANDI & OGIF DI HUJAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"ogif",text:"Lepasin tanganku, Andi. Aku nggak apa-apa."},
+{char:"andi",text:"Gue nggak bakal lepasin lo."},
+{char:"ogif",text:"Kenapa sih kamu selalu kayak gini?"},
+{char:"andi",text:"Karena gue takut kehilangan lo!"},
+{char:"ogif",text:"Andi… jangan bikin aku makin berat."},
+{char:"andi",text:"Gue cuma nggak mau lo jadi korban berikutnya."}
+]
+},
+
+/* =========================
+PART 35 — HANY MENANGIS
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"hany",text:"Iky… aku takut 😢"},
+{char:"iky",text:"Aku di sini."},
+{char:"hany",text:"Jangan sok kuat terus. Kamu juga manusia."},
+{char:"iky",text:"Kalau aku runtuh, kalian ikut runtuh."},
+{char:"hany",text:"Aku nggak peduli soal yang lain… aku cuma peduli kamu."},
+{char:"iky",text:"Hany… kamu harus belajar berdiri tanpa aku."}
 ]
 }
 
