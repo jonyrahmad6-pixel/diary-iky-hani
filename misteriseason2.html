@@ -1352,6 +1352,44 @@ function prevPart(){if(p>0){p--;render()}}
 
 render();
 </script>
+
+<!-- ======= FOOTER INTERAKTIF ======= -->
+<div id="footer" style="max-width:900px;margin:20px auto;padding:20px;background:rgba(0,0,0,0.6);border-radius:16px;color:white;font-family:Poppins,sans-serif;">
+  
+  <h3 style="text-align:center;margin-bottom:12px;">💬 Komentar & Update Season 3</h3>
+  
+  <div id="comments" style="max-height:150px;overflow-y:auto;padding:8px;background:rgba(255,255,255,0.05);border-radius:12px;margin-bottom:12px;">
+    <!-- komentar akan muncul di sini -->
+  </div>
+  
+  <input type="text" id="commentInput" placeholder="Tulis komentar..." style="width:calc(100% - 100px);padding:8px;border-radius:12px;border:none;outline:none;">
+  <button onclick="addComment()" style="width:80px;padding:8px;margin-left:8px;border:none;border-radius:12px;background:#7b5cff;color:white;font-weight:bold;cursor:pointer;">Kirim</button>
+  
+  <p style="margin-top:12px;text-align:center;font-size:.9rem;opacity:.75;">
+    ⚠ Season 3 akan datang! Bersiaplah untuk misteri lebih gelap dan teka-teki baru… 🔥
+  </p>
+</div>
+
+<script>
+// Fungsi tambah komentar
+function addComment(){
+  const input = document.getElementById("commentInput");
+  const text = input.value.trim();
+  if(!text) return;
+  
+  const div = document.createElement("div");
+  div.textContent = "💬 " + text;
+  div.style.marginBottom = "6px";
+  document.getElementById("comments").appendChild(div);
+  
+  input.value = "";
+  
+  // Scroll ke komentar terbaru
+  const commentsDiv = document.getElementById("comments");
+  commentsDiv.scrollTop = commentsDiv.scrollHeight;
+}
+</script>
+
 </body>
 </html>
 
