@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mysteri Pembunuhan Berantai</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow-y:auto;min-height:100vh;}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  width:95%;
+  max-width:900px;
+  margin:20px auto;
+  padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite;
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.charRow{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.charBox{text-align:center;width:60px;flex-shrink:0;}
+.char{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:0 8px 20px rgba(0,0,0,.5)
+}
+.charName{font-size:.65rem;opacity:.75;margin-top:3px;letter-spacing:.5px}
+
+/* Karakter warna */
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.ghost{background:linear-gradient(145deg,#555,#222)}
+
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:12px;padding:10px 12px;
+  line-height:1.5;opacity:0;transform:translateY(4px);
+  transition:.4s ease;
+  word-break:break-word;
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+button,label{
+  padding:6px 14px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer;font-size:.85rem
+}
+
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
+}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
+
+/* GRAYSCALE */
+.grayscale{filter:grayscale(100%)}
+
+/* Responsif HP */
+@media(max-width:600px){
+  .charBox{width:50px;}
+  .char{width:50px;height:50px;font-size:1.5rem;}
+  .bubble{font-size:.85rem;padding:8px 10px;}
+  .controls{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 Mysteri Pembunuhan Berantai 🌑</h2>
+
+  <div class="scene">
+
+    <!-- IKY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
+    </div>
+
+    <!-- ANDI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <!-- HANY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <!-- OGIF -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
+    </div>
+
+    <!-- NO NAME -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char wolf" id="tetuaChar">🐺</div>
+        <div class="charName">NO NAME</div>
+      </div>
+      <div class="bubble" id="nonameBubble"></div>
+    </div>
+
+    <!-- WARGA -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char ghost" id="suanggiChar">🙋🏻‍♂️</div>
+        <div class="charName">WARGA</div>
+      </div>
+      <div class="bubble" id="wargaBubble"></div>
+    </div>
+
+    <!-- NARRATOR -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char" id="narratorChar">📝</div>
+        <div class="charName">NARRATOR</div>
+      </div>
+      <div class="bubble" id="narratorBubble"></div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+
+    <button onclick="nextPart()">⟶</button>
+  </div>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<script>
+const bgm=document.getElementById("bgm");
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
+
+function loadMusic(input){
+  const file=input.files[0];
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
+}
+
+const parts=[
+/* =========================
+PART 1 — PEMBUKAAN KASUS
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"📝 Kota tidak pernah benar-benar tidur. Tapi malam ini… kota itu terasa berbeda."},
+{char:"narrator",text:"📝 Sepuluh korban. Tanpa pola jelas. Tanpa saksi. Tanpa pelaku."},
+{char:"narrator",text:"📝 Hingga satu nama perlahan terseret ke dalam pusaran misteri itu — Iky."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+lines:[
+{char:"iky",text:"🐻 Aku hampir selesai skripsi… kenapa malah kepikiran kasus ini terus."},
+{char:"hany",text:"🐼 Karena kamu nggak bisa berhenti mikir, bahkan buat hal yang bukan tanggung jawabmu."},
+{char:"iky",text:"🐻 Ini bukan sekadar berita. Ada sesuatu yang aneh."},
+{char:"hany",text:"🐼 Aku cuma nggak mau kamu ikut bahaya lagi…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"andi",text:"🦁 Mahasiswa hukum ya? Katanya kamu bisa baca pola TKP."},
+{char:"iky",text:"🐻 Katanya polisi bisa kerja tanpa bantuan mahasiswa."},
+{char:"ogif",text:"🦊 Sudah… jangan mulai adu ego."},
+{char:"andi",text:"🦁 Kasus ini buntu. Jadi kami dengar kamu menemukan sesuatu."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1505666287802-931dc83948e9",
+lines:[
+{char:"iky",text:"🐻 Semua korban ditemukan di radius kota yang sama."},
+{char:"iky",text:"🐻 Tapi waktunya membentuk interval matematis."},
+{char:"ogif",text:"🦊 Jadi pembunuh menjadwalkan?"}, 
+{char:"andi",text:"🦁 Atau seseorang bermain teka-teki."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Saya dengar korban terakhir sempat teriak sebelum hilang…"},
+{char:"andi",text:"🦁 Teriak apa?"}, 
+{char:"warga",text:"🙋🏻‍♂️ Nama seseorang… tapi kami tidak jelas."},
+{char:"narrator",text:"📝 Tidak jelas… atau sengaja tidak diingat?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"hany",text:"🐼 Iky… kamu serius mau bantu mereka?"}, 
+{char:"iky",text:"🐻 Kalau aku bisa cegah korban berikutnya… aku akan coba."},
+{char:"hany",text:"🐼 Aku ikut."},
+{char:"iky",text:"🐻 Ini bukan tugas kampus, Han."},
+{char:"hany",text:"🐼 Aku tetap ikut."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"narrator",text:"📝 Malam pertama penyelidikan dimulai."},
+{char:"narrator",text:"📝 Dan seseorang… mengawasi mereka dari jauh."},
+{char:"noname",text:"🐺 Menarik… akhirnya kau ikut bermain, Iky."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"andi",text:"🦁 TKP pertama."},
+{char:"ogif",text:"🦊 Tidak ada jejak paksaan masuk."},
+{char:"iky",text:"🐻 Artinya korban membuka pintu sendiri."},
+{char:"hany",text:"🐼 Jadi pelaku dikenal korban?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"iky",text:"🐻 Tunggu… posisi furnitur berubah."},
+{char:"andi",text:"🦁 Kamu perhatiin itu?"}, 
+{char:"iky",text:"🐻 Ini bukan pembunuhan acak."},
+{char:"iky",text:"🐻 Ini pesan."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"noname",text:"🐺 Bagus… kau mulai melihat pola."},
+{char:"noname",text:"🐺 Tapi kau belum melihat aku."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1497366216548-37526070297c",
+lines:[
+{char:"ogif",text:"🦊 Andi kamu lembur lagi?"}, 
+{char:"andi",text:"🦁 Sampai kasus selesai."},
+{char:"ogif",text:"🦊 Kamu tidak bisa kerja sendiri terus."},
+{char:"andi",text:"🦁 Aku terbiasa."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"narrator",text:"📝 Ogif tidak berkata lagi."},
+{char:"narrator",text:"📝 Tapi matanya menunjukkan sesuatu yang Andi tidak pernah sadari."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"hany",text:"🐼 Kamu kelihatan capek."},
+{char:"iky",text:"🐻 Ini baru mulai."},
+{char:"hany",text:"🐼 Jangan lupa kamu manusia juga."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Korban berikutnya ditemukan."},
+{char:"narrator",text:"📝 Lokasi berbeda."},
+{char:"narrator",text:"📝 Pola yang sama."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1505664194779-8beaceb93744",
+lines:[
+{char:"andi",text:"🦁 Sebelas korban sekarang."},
+{char:"iky",text:"🐻 Tidak."},
+{char:"andi",text:"🦁 Apa?"}, 
+{char:"iky",text:"🐻 Ini masih sepuluh."},
+{char:"ogif",text:"🦊 Maksudmu?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1507143550189-fed454f93097",
+lines:[
+{char:"iky",text:"🐻 Salah satu korban belum mati."},
+{char:"hany",text:"🐼 Apa?!"},
+{char:"andi",text:"🦁 Rumah sakit sekarang!"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1516549655169-df83a0774514",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Dia sadar sebentar tadi…"},
+{char:"iky",text:"🐻 Dia bilang apa?"}, 
+{char:"warga",text:"🙋🏻‍♂️ Dia bilang… pelaku menunggu seseorang."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"hany",text:"🐼 Menunggu siapa…?"}, 
+{char:"warga",text:"🙋🏻‍♂️ Dia bilang nama… Iky."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"noname",text:"🐺 Ya… aku menunggumu."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"📝 Permainan telah dimulai."},
+{char:"narrator",text:"📝 Dan Iky… bukan lagi pengamat."},
+{char:"narrator",text:"📝 Ia kini bagian dari teka-teki."}
+]
+},
+
+/* =========================
+PART 21 — TARGET
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"hany",text:"🐼 Kenapa dia menyebut namamu…"},
+{char:"iky",text:"🐻 Aku tidak tahu."},
+{char:"andi",text:"🦁 Tapi sekarang kamu target."},
+{char:"ogif",text:"🦊 Artinya kita harus bergerak cepat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"iky",text:"🐻 Semua korban punya koneksi."},
+{char:"andi",text:"🦁 Apa?"}, 
+{char:"iky",text:"🐻 Mereka pernah terlibat kasus hukum lama."},
+{char:"ogif",text:"🦊 Kasus apa?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"iky",text:"🐻 Pengadilan kota. Sepuluh tahun lalu."},
+{char:"hany",text:"🐼 Itu sebelum kita kuliah…"},
+{char:"andi",text:"🦁 Aku ambil arsipnya."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"narrator",text:"📝 Malam semakin larut."},
+{char:"narrator",text:"📝 Arsip tua mulai dibuka."},
+{char:"ogif",text:"🦊 Ini dia… daftar saksi sidang."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"andi",text:"🦁 Semua korban ada di sini."},
+{char:"iky",text:"🐻 Tunggu… ada satu nama lagi."},
+{char:"hany",text:"🐼 Jangan bilang…"},
+{char:"iky",text:"🐻 Namaku juga tercatat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"noname",text:"🐺 Kau bagian dari masa lalu itu."},
+{char:"noname",text:"🐺 Tapi kau lupa."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1507143550189-fed454f93097",
+lines:[
+{char:"hany",text:"🐼 Iky… kamu tidak pernah cerita."},
+{char:"iky",text:"🐻 Karena aku sendiri tidak ingat."},
+{char:"andi",text:"🦁 Kita cari saksi lama."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Kasus itu? Sudah lama sekali."},
+{char:"warga",text:"🙋🏻‍♂️ Anak kecil hilang waktu itu."},
+{char:"iky",text:"🐻 Anak kecil?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Ada empat."},
+{char:"warga",text:"🙋🏻‍♂️ Satu selamat… tiga tidak pernah ditemukan."},
+{char:"hany",text:"🐼 Jangan bilang itu korban sekarang…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1497366216548-37526070297c",
+lines:[
+{char:"iky",text:"🐻 Ini balas dendam."},
+{char:"andi",text:"🦁 Tapi terhadap siapa?"}, 
+{char:"iky",text:"🐻 Semua yang terlibat penyelidikan waktu itu."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"ogif",text:"🦊 Termasuk kamu."},
+{char:"iky",text:"🐻 Ya."},
+{char:"hany",text:"🐼 Aku tidak suka ini."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"andi",text:"🦁 Aku antar kamu pulang."},
+{char:"ogif",text:"🦊 Aku bisa sendiri."},
+{char:"andi",text:"🦁 Aku tetap antar."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1505664194779-8beaceb93744",
+lines:[
+{char:"ogif",text:"🦊 Kamu terlalu protektif."},
+{char:"andi",text:"🦁 Ini pekerjaanku."},
+{char:"ogif",text:"🦊 Kadang bukan cuma itu kan?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"andi",text:"🦁 Jangan mulai."},
+{char:"narrator",text:"📝 Kata-kata itu tajam."},
+{char:"narrator",text:"📝 Dan Ogif memilih diam."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"narrator",text:"📝 Malam itu Iky menerima paket."},
+{char:"hany",text:"🐼 Jangan dibuka sendirian!"},
+{char:"iky",text:"🐻 Sudah terlambat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1516549655169-df83a0774514",
+lines:[
+{char:"iky",text:"🐻 Foto lama…"},
+{char:"hany",text:"🐼 Itu kamu waktu kecil."},
+{char:"iky",text:"🐻 Dan tiga anak lain."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"iky",text:"🐻 Di belakangnya ada tulisan."},
+{char:"hany",text:"🐼 Apa katanya?"}, 
+{char:"iky",text:"🐻 Giliranmu mengingat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"noname",text:"🐺 Ingatan adalah kunci."},
+{char:"noname",text:"🐺 Tanpanya kau akan kalah."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"📝 Malam berakhir tanpa jawaban."},
+{char:"narrator",text:"📝 Tapi satu hal pasti."},
+{char:"narrator",text:"📝 Pembunuh semakin dekat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"narrator",text:"📝 Dan permainan ini…"},
+{char:"narrator",text:"📝 Baru memasuki babak berikutnya."}
+]
+},
+
+/* =========================
+PART 41 — INGATAN RETAK
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Malam berikutnya tidur Iky tidak tenang."},
+{char:"narrator",text:"📝 Ingatan lama mulai muncul…"},
+{char:"iky",text:"🐻 Aku ingat ruangan itu…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17",
+lines:[
+{char:"iky",text:"🐻 Kami dikunci di tempat gelap."},
+{char:"hany",text:"🐼 Kamu serius?"}, 
+{char:"iky",text:"🐻 Ada seseorang mengawasi."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"andi",text:"🦁 Itu penculikan."},
+{char:"ogif",text:"🦊 Dan kasusnya ditutup begitu saja?"},
+{char:"iky",text:"🐻 Sepertinya iya."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1497366216548-37526070297c",
+lines:[
+{char:"andi",text:"🦁 Aku buka ulang file polisi lama."},
+{char:"hany",text:"🐼 Kita semua ikut."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Orang dulu tidak mau bahas itu."},
+{char:"warga",text:"🙋🏻‍♂️ Katanya terlalu banyak kesalahan prosedur."},
+{char:"iky",text:"🐻 Ditutup-tutupi…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"narrator",text:"📝 Hujan turun deras."},
+{char:"narrator",text:"📝 Suasana makin menekan."},
+{char:"hany",text:"🐼 Aku tidak suka firasat ini."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"ogif",text:"🦊 Iky… lihat ini."},
+{char:"iky",text:"🐻 Foto lokasi lama…"},
+{char:"andi",text:"🦁 Gudang terbengkalai di pinggir kota."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"hany",text:"🐼 Kita kesana sekarang?"},
+{char:"iky",text:"🐻 Kita harus."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"narrator",text:"📝 Mereka tiba di gudang."},
+{char:"narrator",text:"📝 Bau karat dan debu memenuhi udara."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"iky",text:"🐻 Di sini… aku pernah di sini."},
+{char:"hany",text:"🐼 Pegang tanganku."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"narrator",text:"📝 Sebuah ruangan kecil ditemukan."},
+{char:"andi",text:"🦁 Bekas rantai…"},
+{char:"ogif",text:"🦊 Ini nyata."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1507143550189-fed454f93097",
+lines:[
+{char:"iky",text:"🐻 Aku ingat suara seseorang menangis."},
+{char:"hany",text:"🐼 Anak lain…"},
+{char:"iky",text:"🐻 Ya."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"andi",text:"🦁 Ada pintu rahasia di sini."},
+{char:"ogif",text:"🦊 Aku bantu buka."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1516549655169-df83a0774514",
+lines:[
+{char:"narrator",text:"📝 Di dalamnya… kotak besi tua."},
+{char:"iky",text:"🐻 Isinya rekaman kaset."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"narrator",text:"📝 Kaset diputar."},
+{char:"noname",text:"🐺 Anak-anak harus belajar takut."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"hany",text:"🐼 Itu suara siapa…"},
+{char:"iky",text:"🐻 Aku tidak tahu… tapi familiar."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"andi",text:"🦁 Ada daftar nama lagi."},
+{char:"ogif",text:"🦊 Termasuk pelaku penyelidikan lama."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"iky",text:"🐻 Jadi pembunuh sekarang… salah satu anak?"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"hany",text:"🐼 Atau seseorang yang tahu semuanya."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"narrator",text:"📝 Tiba-tiba suara langkah terdengar."},
+{char:"narrator",text:"📝 Seseorang mengawasi mereka."},
+{char:"narrator",text:"📝 Dan kali ini… lebih dekat."}
+]
+}
+
+/* =========================
+PART 61 — DIINTAI
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Malam semakin dingin."},
+{char:"narrator",text:"📝 Perasaan diawasi tidak hilang."},
+{char:"hany",text:"🐼 Iky… aku takut."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"iky",text:"🐻 Aku di sini."},
+{char:"iky",text:"🐻 Tidak akan terjadi apa-apa."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1497366216548-37526070297c",
+lines:[
+{char:"andi",text:"🦁 Aku pasang pengawasan tambahan."},
+{char:"ogif",text:"🦊 Tapi pelaku selalu selangkah lebih dulu."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Ada kejadian lagi!"},
+{char:"hany",text:"🐼 Jangan bilang…"},
+{char:"andi",text:"🦁 Kita berangkat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"narrator",text:"📝 TKP baru ditemukan."},
+{char:"narrator",text:"📝 Tapi tidak ada mayat."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17",
+lines:[
+{char:"ogif",text:"🦊 Korban masih hidup."},
+{char:"iky",text:"🐻 Dia diculik."},
+{char:"andi",text:"🦁 Dan ini jebakan."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"narrator",text:"📝 Sebuah pesan ditemukan."},
+{char:"noname",text:"🐺 Datang sendiri, Iky."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"hany",text:"🐼 Jangan pergi sendirian!"},
+{char:"iky",text:"🐻 Dia memancingku."},
+{char:"iky",text:"🐻 Aku harus hadapi."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"andi",text:"🦁 Ini berbahaya."},
+{char:"ogif",text:"🦊 Kita tetap backup dari jauh."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"narrator",text:"📝 Lokasi: gedung kosong."},
+{char:"iky",text:"🐻 Aku masuk."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1507143550189-fed454f93097",
+lines:[
+{char:"noname",text:"🐺 Akhirnya kamu datang."},
+{char:"iky",text:"🐻 Lepaskan korban."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"noname",text:"🐺 Kamu pintar."},
+{char:"noname",text:"🐺 Sama seperti dulu."},
+{char:"iky",text:"🐻 Jadi kau mengenalku."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"narrator",text:"📝 Tiba-tiba serangan terjadi."},
+{char:"narrator",text:"📝 Iky jatuh terpukul."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"hany",text:"🐼 IKY!!!"},
+{char:"andi",text:"🦁 Tim masuk sekarang!"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1516549655169-df83a0774514",
+lines:[
+{char:"narrator",text:"📝 Kekacauan terjadi."},
+{char:"ogif",text:"🦊 Pelaku kabur!"},
+{char:"andi",text:"🦁 Fokus ke Iky!"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"hany",text:"🐼 Bangun… tolong bangun…"},
+{char:"iky",text:"🐻 Aku… masih hidup."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"andi",text:"🦁 Korban berhasil ditemukan."},
+{char:"ogif",text:"🦊 Dia saksi penting sekarang."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"iky",text:"🐻 Dia bilang sesuatu…"},
+{char:"hany",text:"🐼 Apa?"},
+{char:"iky",text:"🐻 Ini belum selesai."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"narrator",text:"📝 Malam itu mereka sadar."},
+{char:"narrator",text:"📝 Pembunuh tidak hanya membunuh."},
+{char:"narrator",text:"📝 Dia bermain."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"noname",text:"🐺 Permainan baru saja dimulai."},
+{char:"narrator",text:"📝 Dan targetnya kini jelas…"},
+{char:"narrator",text:"📝 IKY."}
+]
+},
+
+/* =========================
+PART 81 — PERBURUAN AKHIR
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Polisi meningkatkan operasi pencarian."},
+{char:"andi",text:"🦁 Kali ini kita akhiri."},
+{char:"ogif",text:"🦊 Semua unit siaga."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"iky",text:"🐻 Aku ingat kata-katanya."},
+{char:"hany",text:"🐼 Jangan paksa dirimu."},
+{char:"iky",text:"🐻 Ini satu-satunya cara."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"narrator",text:"📝 Iky menyusun ulang semua petunjuk."},
+{char:"iky",text:"🐻 Lokasi berikutnya… pelabuhan lama."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"andi",text:"🦁 Bergerak sekarang."},
+{char:"ogif",text:"🦊 Jangan sampai lolos lagi."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"narrator",text:"📝 Malam berkabut menyelimuti pelabuhan."},
+{char:"noname",text:"🐺 Selamat datang."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"iky",text:"🐻 Permainan selesai."},
+{char:"noname",text:"🐺 Justru baru mencapai puncaknya."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+lines:[
+{char:"andi",text:"🦁 Angkat tangan!"}, 
+{char:"narrator",text:"📝 Sosok itu tertawa pelan."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1516549655169-df83a0774514",
+lines:[
+{char:"noname",text:"🐺 Kau pikir aku sendiri?"}, 
+{char:"narrator",text:"📝 Keheningan membeku."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"iky",text:"🐻 Apa maksudmu?"}, 
+{char:"noname",text:"🐺 Selalu ada dalang di atas bayangan."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"narrator",text:"📝 Pelaku mencoba kabur."},
+{char:"andi",text:"🦁 KEJAR!"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"📝 Kejar-kejaran terjadi."},
+{char:"ogif",text:"🦊 Jalur kiri tertutup!"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1507143550189-fed454f93097",
+lines:[
+{char:"narrator",text:"📝 Tembakan peringatan dilepaskan."},
+{char:"noname",text:"🐺 Aku kalah…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"andi",text:"🦁 Tersangka ditangkap."},
+{char:"hany",text:"🐼 Ini akhirnya selesai…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
+lines:[
+{char:"iky",text:"🐻 Tidak."},
+{char:"iky",text:"🐻 Ada sesuatu yang belum terjawab."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17",
+lines:[
+{char:"narrator",text:"📝 Interogasi dilakukan."},
+{char:"noname",text:"🐺 Aku hanya pion."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"andi",text:"🦁 Siapa dalangnya?"},
+{char:"noname",text:"🐺 Kalian tak akan siap."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1497366216548-37526070297c",
+lines:[
+{char:"narrator",text:"📝 Pelaku tersenyum."},
+{char:"noname",text:"🐺 Bahkan sekarang dia melihat kalian."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Kasus dinyatakan selesai."},
+{char:"narrator",text:"📝 Tapi perasaan tidak tuntas tetap ada."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"hany",text:"🐼 Kamu hampir mati tadi."},
+{char:"iky",text:"🐻 Tapi aku masih di sini."},
+{char:"hany",text:"🐼 Jangan lakukan itu lagi…"}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+lines:[
+{char:"narrator",text:"📝 Di tempat lain…"},
+{char:"narrator",text:"📝 Seseorang membaca berita penangkapan."},
+{char:"narrator",text:"📝 Dia tersenyum."}
+]
+},
+
+/* =========================
+PART 101 — HENING SETELAH KASUS
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+lines:[
+{char:"narrator",text:"📝 Kota kembali berjalan seperti biasa."},
+{char:"narrator",text:"📝 Tapi beberapa luka tidak pernah benar-benar sembuh."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1492724441997-5dc865305da7",
+lines:[
+{char:"hany",text:"🐼 Kamu tidur sama sekali nggak?"}, 
+{char:"iky",text:"🐻 Setiap aku pejamkan mata… teka-teki itu masih ada."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
+lines:[
+{char:"hany",text:"🐼 Kamu nggak harus tanggung semuanya sendiri."},
+{char:"iky",text:"🐻 Aku tahu."},
+{char:"iky",text:"🐻 Dan aku bersyukur kamu selalu di sini."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500534623283-312aade485b7",
+lines:[
+{char:"andi",text:"🦁 Kerja bagus, bocah hukum."},
+{char:"ogif",text:"🦊 Walau masih banyak misteri tersisa."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+lines:[
+{char:"narrator",text:"📝 Nama para korban diabadikan."},
+{char:"narrator",text:"📝 Sebuah pengingat bahwa keadilan punya harga."}
+]
+},
+
+/* =========================
+CREDIT ROLL
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1519682337058-a94d519337bc",
+lines:[
+{char:"narrator",text:"📝 — CASE CLOSED —"},
+{char:"narrator",text:"📝 IKY"},
+{char:"narrator",text:"📝 HANY"},
+{char:"narrator",text:"📝 ANDI"},
+{char:"narrator",text:"📝 OGIF"},
+{char:"narrator",text:"📝 WARGA KOTA"},
+{char:"narrator",text:"📝 DAN MEREKA YANG HILANG"}
+]
+},
+
+/* =========================
+AFTER CREDIT SCENE
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+lines:[
+{char:"narrator",text:"📝 Setelah semuanya berakhir…"},
+{char:"narrator",text:"📝 Di sebuah ruangan gelap."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1500048993959-d6f8f4c0bfb4",
+lines:[
+{char:"narrator",text:"📝 Sebuah papan penuh foto korban lain terlihat."},
+{char:"narrator",text:"📝 Jauh lebih banyak dari sepuluh."}
+]
+},
+
+/* ========================= */
+{
+bg:"https://images.unsplash.com/photo-1470165510339-59b8cb9b8cde",
+lines:[
+{char:"narrator",text:"📝 Sosok tak dikenal menempelkan foto IKY."},
+{char:"narrator",text:"📝 Lingkaran merah ditarik di sekelilingnya."}
+]
+},
+
+/* =========================
+FINAL HOOK
+========================= */
+{
+bg:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+lines:[
+{char:"noname",text:"🐺 Permainan sebenarnya… baru akan dimulai."},
+{char:"narrator",text:"📝 — END —"}
+]
+}
+
+]; // nanti isi cerita bisa dilanjutkan
+ 
+let p=0,l=0;
+
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
+  }
+}
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },50);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p]?.lines[l];
+  if(!line) return;
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(!bubble) return;
+  if(mood(line.text)){
+    rain(true);
+    jumpscare();
+    if(line.char=="noname"){ setTimeout(()=>{jumpscare()},300); }
+  } else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  if(parts[p]) document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
+
+render();
+</script>
+</body>
+</html>
+
