@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KKN Desa Keramat</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow-y:auto;min-height:100vh;}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  width:95%;
+  max-width:900px;
+  margin:20px auto;
+  padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite;
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.charRow{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.charBox{text-align:center;width:60px;flex-shrink:0;}
+.char{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:0 8px 20px rgba(0,0,0,.5)
+}
+.charName{font-size:.65rem;opacity:.75;margin-top:3px;letter-spacing:.5px}
+
+/* Karakter warna */
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.ghost{background:linear-gradient(145deg,#555,#222)}
+
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:12px;padding:10px 12px;
+  line-height:1.5;opacity:0;transform:translateY(4px);
+  transition:.4s ease;
+  word-break:break-word;
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+button,label{
+  padding:6px 14px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer;font-size:.85rem
+}
+
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
+}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
+
+/* GRAYSCALE */
+.grayscale{filter:grayscale(100%)}
+
+/* Responsif HP */
+@media(max-width:600px){
+  .charBox{width:50px;}
+  .char{width:50px;height:50px;font-size:1.5rem;}
+  .bubble{font-size:.85rem;padding:8px 10px;}
+  .controls{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 KKN Desa Keramat 🌑</h2>
+
+  <div class="scene">
+
+    <!-- IKY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
+    </div>
+
+    <!-- ANDI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <!-- HANY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <!-- OGIF -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
+    </div>
+
+    <!-- TETUA -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char wolf" id="tetuaChar">🐺</div>
+        <div class="charName">TETUA</div>
+      </div>
+      <div class="bubble" id="tetuaBubble"></div>
+    </div>
+
+    <!-- SUANGGI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char ghost" id="suanggiChar">👻</div>
+        <div class="charName">SUANGGI</div>
+      </div>
+      <div class="bubble" id="suanggiBubble"></div>
+    </div>
+
+    <!-- NARRATOR -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char" id="narratorChar">📝</div>
+        <div class="charName">NARRATOR</div>
+      </div>
+      <div class="bubble" id="narratorBubble"></div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+
+    <button onclick="nextPart()">⟶</button>
+  </div>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<script>
+const bgm=document.getElementById("bgm");
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
+
+function loadMusic(input){
+  const file=input.files[0];
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
+}
+
+const parts=[
+/* =========================
+PART 61 — SUANGGI MUNCUL LAGI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"suanggi",text:"AAAA… kalian pikir bisa bebas begitu saja?"},
+{char:"andi",text:"Cepat, posisi kalian jangan berpisah!"},
+{char:"ogif",text:"Hujan tambah deras… aku nggak suka ini sama sekali."},
+{char:"hany",text:"Aku… aku takut… tapi aku harus ingat Iky."}
+]
+},
+
+/* =========================
+PART 62 — IKY MUNCUL DALAM KENANGAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Iky muncul di antara rintik hujan… bayangan yang menenangkan Hany."},
+{char:"hany",text:"Iky… aku bisa merasakanmu…"},
+{char:"andi",text:"Hany, jangan terlalu larut… kita masih harus fokus."},
+{char:"ogif",text:"Andi… dia muncul… tapi kenapa rasanya aneh?"}
+]
+},
+
+/* =========================
+PART 63 — PETIR DAN TEKANAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Petir bukan hanya alam… ini pertanda roh Suanggi murka!"},
+{char:"andi",text:"Cepat! Tekan ukiran batu bersama-sama!"},
+{char:"ogif",text:"Kita harus sinkron… jangan sampai salah."},
+{char:"hany",text:"Aku… aku ingin selamat… demi Iky…"}
+]
+},
+
+/* =========================
+PART 64 — KERJA SAMA
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"andi",text:"Gif, ikut tekan ukirannya! Jangan ragu!"},
+{char:"ogif",text:"Oke… aku ikut…"},
+{char:"hany",text:"Aku… ikut juga… Iky, kau lihat aku kan?"},
+{char:"narrator",text:"Ketiganya menekan ukiran batu secara bersamaan, air hujan memercik di sekeliling."}
+]
+},
+
+/* =========================
+PART 65 — SUB-PLOT ANDI–OGIF
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"andi",text:"Gif… aku nggak akan biarin apa pun nyerangmu… percaya sama aku."},
+{char:"ogif",text:"Andi… aku… terima kasih… tapi jangan terlalu protektif ya."},
+{char:"narrator",text:"Ketegangan romantis antara Andi dan Ogif mulai muncul di tengah teror."}
+]
+},
+
+/* =========================
+PART 66 — LORE MISTERIUS
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Noken Merah bukan sekadar roh… dia menjaga rahasia desa dan orang-orangnya."},
+{char:"narrator",text:"Angin menderu, membawa bisikan dari hutan gelap… menambah ketegangan."},
+{char:"andi",text:"Jika salah langkah, kita bisa kehilangan nyawa…"}
+]
+},
+
+/* =========================
+PART 67 — TEKANAN SUANGGI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"suanggi",text:"AAAA… aku lapar… aku haus darah!"},
+{char:"hany",text:"Aku… aku nggak mau kehilanganmu…"},
+{char:"ogif",text:"Andi… jangan biarin dia dekat Hany!"},
+{char:"andi",text:"Aku jaga kalian semua… tetap tenang!"}
+]
+},
+
+/* =========================
+PART 68 — GRAYSCALE EMOSI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Grayscale seketika menyelimuti pemandangan… menandakan kesedihan dan trauma Hany."},
+{char:"hany",text:"Iky… aku ingin kau di sini… tapi kau pergi…"},
+{char:"ogif",text:"Hany, tetap kuat… aku di sini."},
+{char:"andi",text:"Kita harus selamat… kita harus selamat…"}
+]
+},
+
+/* =========================
+PART 69 — KLIMAKS TRAGEDI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"suanggi",text:"AAAA… kali ini aku takkan dibiarkan!"},
+{char:"narrator",text:"Seketika, Iky mengorbankan dirinya, menahan Suanggi agar Hany dan teman-teman selamat."},
+{char:"hany",text:"IKY!!! Jangan tinggalkan aku…"},
+{char:"ogif",text:"Andi… cepat bantu Hany, jangan lihat ke belakang!"},
+{char:"andi",text:"Aku jaga kalian… tetaplah bergerak…"}
+]
+},
+
+/* =========================
+PART 70 — RELA BERKORBAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Iky tersapu oleh kegelapan Suanggi, hujan deras dan petir menambah dramatisnya…"},
+{char:"hany",text:"Aku… aku akan selalu mengingatmu, Iky…"},
+{char:"andi",text:"Gif… kita harus keluar… jangan biarkan hatimu tenggelam dalam kesedihan."},
+{char:"ogif",text:"Kita akan selamat… Iky… terima kasih…"}
+]
+},
+
+/* =========================
+PART 71 — SELAMAT DARI SUANGGI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Hujan mulai reda, Suanggi menghilang sementara, meninggalkan jejak gelap di hutan."},
+{char:"hany",text:"Aku… aku masih hidup… tapi hatiku hancur…"},
+{char:"andi",text:"Gif… ayo kita keluar dari sini… kita harus tetap bergerak."},
+{char:"ogif",text:"Ya… jangan lihat ke belakang…"}
+]
+},
+
+/* =========================
+PART 72 — REFLEKSI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"andi",text:"Iky… kau benar-benar berani… aku nggak akan melupakanmu."},
+{char:"hany",text:"Iky… aku ingin kau di sini… tapi aku harus kuat…"},
+{char:"ogif",text:"Kita harus selamat… demi Iky dan demi diri kita sendiri."},
+{char:"tetua",text:"Roh Iky kini menjaga kalian, jangan langgar batas desa lagi."}
+]
+},
+
+/* =========================
+PART 73 — PETIR TERAKHIR
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Petir terakhir menyambar langit, menandai berakhirnya teror malam itu…"},
+{char:"hany",text:"Aku merasa ada yang menatapku… tapi bukan Suanggi…"},
+{char:"andi",text:"Itu Iky… dia masih di sini… menjaga kita…"},
+{char:"ogif",text:"Kehilangan seseorang itu berat… tapi kita harus melanjutkan hidup."}
+]
+},
+
+/* =========================
+PART 74 — SUB-PLOT ANDI–OGIF KONTINUES
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"andi",text:"Gif… aku ingin kau tahu… aku akan selalu ada untukmu."},
+{char:"ogif",text:"Andi… aku… aku… terima kasih… tapi ini terlalu cepat."},
+{char:"narrator",text:"Romance mereka tetap samar, namun ketegangan membuat mereka saling peduli."}
+]
+},
+
+/* =========================
+PART 75 — EMOSI HANY
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"hany",text:"Iky… aku tak pernah menyangka harus kehilanganmu…"},
+{char:"narrator",text:"Hany menunduk, air mata bercampur rintik hujan, mengingat pengorbanan Iky."},
+{char:"andi",text:"Hany… jangan terlalu larut… kita harus keluar dari desa ini."},
+{char:"ogif",text:"Tetap kuat… demi Iky."}
+]
+},
+
+/* =========================
+PART 76 — NARASI TETUA
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Desa ini penuh rahasia… roh menjaga yang hidup, dan menghukum yang lengah."},
+{char:"narrator",text:"Kata-kata tetua menambah rasa takut sekaligus hormat bagi para penyintas."},
+{char:"andi",text:"Kita harus menghormati tradisi, agar tidak ada lagi korban."}
+]
+},
+
+/* =========================
+PART 77 — PEMULIHAN
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"hany",text:"Hati ini masih sakit… tapi aku harus terus berjalan…"},
+{char:"ogif",text:"Kita selamat… itu yang terpenting…"},
+{char:"andi",text:"Iky… kami tidak akan lupa…"}
+]
+},
+
+/* =========================
+PART 78 — CREDIT ROLL DIMULAI
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"🌑 Terima kasih telah mengikuti perjalanan KKN Desa Keramat 🌑"},
+{char:"narrator",text:"Cerita ini diadaptasi dari kisah mistis pedalaman Papua."},
+{char:"narrator",text:"Roh Iky akan selalu menjaga Hany, Andi, dan Ogif."}
+]
+},
+
+/* =========================
+PART 79 — HINT LORE PAPUA MISTIS
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"tetua",text:"Noken Merah adalah simbol pengorbanan… roh yang melindungi dan menuntun para penyintas."},
+{char:"narrator",text:"Hutan Papua penuh misteri… jangan pernah meremehkan kekuatan alam dan roh."}
+]
+},
+
+/* =========================
+PART 80 — ENDING TRAGIS
+========================= */
+{
+bg:"https://i.pinimg.com/originals/eb/24/69/eb24690d9174e441a68534a3cbc4e477.gif",
+lines:[
+{char:"narrator",text:"Akhirnya, hujan reda. Hany, Andi, dan Ogif selamat… namun Iky tetap abadi dalam kenangan."},
+{char:"hany",text:"Aku akan selalu merindukanmu, Iky…"},
+{char:"andi",text:"Kita harus lanjutkan hidup… tapi takkan pernah melupakan pengorbananmu."},
+{char:"ogif",text:"Iky… terima kasih…"}
+]
+}
+
+]; // nanti isi cerita bisa dilanjutkan
+
+let p=0,l=0;
+
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
+  }
+}
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },50);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p]?.lines[l];
+  if(!line) return;
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(!bubble) return;
+  if(mood(line.text)){
+    rain(true);
+    jumpscare();
+    if(line.char=="suanggi"){ setTimeout(()=>{jumpscare()},300); }
+  } else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  if(parts[p]) document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
+
+render();
+</script>
+</body>
+</html>
+
