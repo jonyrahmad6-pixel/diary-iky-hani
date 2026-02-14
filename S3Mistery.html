@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mysteri Pembunuhan Berantai</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow-y:auto;min-height:100vh;}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  width:95%;
+  max-width:900px;
+  margin:20px auto;
+  padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite;
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.charRow{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.charBox{text-align:center;width:60px;flex-shrink:0;}
+.char{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:0 8px 20px rgba(0,0,0,.5)
+}
+.charName{font-size:.65rem;opacity:.75;margin-top:3px;letter-spacing:.5px}
+
+/* Karakter warna */
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.ghost{background:linear-gradient(145deg,#555,#222)}
+
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:12px;padding:10px 12px;
+  line-height:1.5;opacity:0;transform:translateY(4px);
+  transition:.4s ease;
+  word-break:break-word;
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+button,label{
+  padding:6px 14px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer;font-size:.85rem
+}
+
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
+}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
+
+/* GRAYSCALE */
+.grayscale{filter:grayscale(100%)}
+
+/* Responsif HP */
+@media(max-width:600px){
+  .charBox{width:50px;}
+  .char{width:50px;height:50px;font-size:1.5rem;}
+  .bubble{font-size:.85rem;padding:8px 10px;}
+  .controls{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 Mysteri Pembunuhan Berantai 🌑</h2>
+
+  <div class="scene">
+
+    <!-- IKY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
+    </div>
+
+    <!-- ANDI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <!-- HANY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <!-- OGIF -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
+    </div>
+
+    <!-- NO NAME -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char wolf" id="tetuaChar">🐺</div>
+        <div class="charName">NO NAME</div>
+      </div>
+      <div class="bubble" id="nonameBubble"></div>
+    </div>
+
+    <!-- WARGA -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char ghost" id="suanggiChar">🙋🏻‍♂️</div>
+        <div class="charName">WARGA</div>
+      </div>
+      <div class="bubble" id="wargaBubble"></div>
+    </div>
+
+    <!-- NARRATOR -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char" id="narratorChar">📝</div>
+        <div class="charName">NARRATOR</div>
+      </div>
+      <div class="bubble" id="narratorBubble"></div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+
+    <button onclick="nextPart()">⟶</button>
+  </div>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<script>
+const bgm=document.getElementById("bgm");
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
+
+function loadMusic(input){
+  const file=input.files[0];
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
+}
+
+const parts=[
+{
+bg:"bg/citynight.jpg",
+lines:[
+{char:"narrator",text:"📝 Kota belum pulih dari kasus sebelumnya. Tapi ketenangan itu terasa palsu."},
+{char:"narrator",text:"📝 Malam ini sebuah laporan baru masuk ke kepolisian."},
+{char:"andi",text:"🦁 Jangan bilang lagi-lagi pembunuhan misterius…"},
+{char:"ogif",text:"🦊 Sayangnya iya. Dan pola lukanya familiar."}
+]
+},
+
+{
+bg:"bg/police.jpg",
+lines:[
+{char:"andi",text:"🦁 Korban pria dewasa. Tidak ada saksi."},
+{char:"ogif",text:"🦊 Tapi ada simbol ini lagi… persis seperti kasus lama."},
+{char:"andi",text:"🦁 Jangan bercanda…"},
+{char:"narrator",text:"📝 Simbol itu seharusnya sudah berhenti muncul."}
+]
+},
+
+{
+bg:"bg/campusnight.jpg",
+lines:[
+{char:"iky",text:"🐻 Hany, kamu lihat berita itu?"}, 
+{char:"hany",text:"🐼 Aku lihat… kamu jangan ikut campur ya."},
+{char:"iky",text:"🐻 Kalau ada pola, pasti ada logika."},
+{char:"hany",text:"🐼 Aku cuma takut kamu kenapa-napa…"}
+]
+},
+
+{
+bg:"bg/apartment.jpg",
+lines:[
+{char:"narrator",text:"📝 Keesokan harinya Iky menerima email anonim."},
+{char:"noname",text:"🐺 Kau selalu menemukan jawabannya."},
+{char:"noname",text:"🐺 Bagaimana kalau kali ini… jawabannya tentang dirimu sendiri?"}
+]
+},
+
+{
+bg:"bg/lab.jpg",
+lines:[
+{char:"andi",text:"🦁 Iky, kamu datang juga."},
+{char:"ogif",text:"🦊 Kita butuh analisismu."},
+{char:"iky",text:"🐻 Aku akan coba."},
+{char:"narrator",text:"📝 Bukti yang diberikan terasa… terlalu familiar."}
+]
+},
+
+{
+bg:"bg/file.jpg",
+lines:[
+{char:"iky",text:"🐻 Tunggu… ini arsip lama?"}, 
+{char:"ogif",text:"🦊 File rahasia. Baru dibuka pagi ini."},
+{char:"andi",text:"🦁 Isinya daftar target."},
+{char:"narrator",text:"📝 Iky membalik halaman demi halaman."}
+]
+},
+
+{
+bg:"bg/darkroom.jpg",
+lines:[
+{char:"iky",text:"🐻 …Apa ini…"},
+{char:"hany",text:"🐼 Kenapa kamu diam?"}, 
+{char:"iky",text:"🐻 Namaku ada di sini."},
+{char:"narrator",text:"📝 Ruangan mendadak sunyi."}
+]
+},
+
+{
+bg:"bg/tension.jpg",
+lines:[
+{char:"andi",text:"🦁 Itu pasti kesalahan data."},
+{char:"ogif",text:"🦊 Atau bukan."},
+{char:"hany",text:"🐼 Ini nggak lucu…"},
+{char:"iky",text:"🐻 Kalau aku target… berarti aku bagian dari teka-teki ini."}
+]
+},
+
+{
+bg:"bg/rainstreet.jpg",
+lines:[
+{char:"narrator",text:"📝 Malam turun. Hujan tipis menyelimuti kota."},
+{char:"noname",text:"🐺 Kami tidak memburumu."},
+{char:"noname",text:"🐺 Kami mengamatimu."},
+{char:"narrator",text:"📝 Pesan anonim lain muncul di ponsel Iky."}
+]
+},
+
+{
+bg:"bg/roomdark.jpg",
+lines:[
+{char:"hany",text:"🐼 Kamu jangan hadapi ini sendirian."},
+{char:"iky",text:"🐻 Aku harus tahu kenapa aku dipilih."},
+{char:"hany",text:"🐼 Aku tetap di sampingmu."},
+{char:"narrator",text:"📝 Permainan baru saja dimulai."}
+]
+},
+
+{
+bg:"bg/policeboard.jpg",
+lines:[
+{char:"narrator",text:"📝 Papan investigasi mulai penuh dengan benang merah dan foto korban."},
+{char:"andi",text:"🦁 Semua kasus ini terhubung… tapi bukan lewat pelaku."},
+{char:"ogif",text:"🦊 Melainkan lewat pola pengujian."},
+{char:"iky",text:"🐻 Jadi ini bukan pembunuhan acak… ini seleksi."}
+]
+},
+
+{
+bg:"bg/archive.jpg",
+lines:[
+{char:"narrator",text:"📝 Iky menemukan arsip korban lama."},
+{char:"iky",text:"🐻 Semua punya prestasi akademik atau analitis tinggi."},
+{char:"hany",text:"🐼 Mereka pilih orang pintar?"},
+{char:"iky",text:"🐻 Lebih tepatnya… orang yang bisa mereka manfaatkan."}
+]
+},
+
+{
+bg:"bg/phoneglow.jpg",
+lines:[
+{char:"noname",text:"🐺 Selamat. Kau memahami pola pertama."},
+{char:"noname",text:"🐺 Tes berikutnya menunggumu."},
+{char:"iky",text:"🐻 Dia sengaja bicara langsung padaku."},
+{char:"hany",text:"🐼 Aku benci ini…"}
+]
+},
+
+{
+bg:"bg/warehouse.jpg",
+lines:[
+{char:"narrator",text:"📝 Lokasi dikirim. Gudang tua pinggir kota."},
+{char:"andi",text:"🦁 Kita datang bareng."},
+{char:"iky",text:"🐻 Tidak. Ini ditujukan untukku."},
+{char:"ogif",text:"🦊 Dan itu alasan kami ikut."}
+]
+},
+
+{
+bg:"bg/insidewarehouse.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka masuk. Sunyi. Hanya satu meja di tengah ruangan."},
+{char:"hany",text:"🐼 Ada kotak di sana."},
+{char:"iky",text:"🐻 Terkunci teka-teki mekanik…"},
+{char:"iky",text:"🐻 …selesai."}
+]
+},
+
+{
+bg:"bg/openbox.jpg",
+lines:[
+{char:"narrator",text:"📝 Di dalamnya hanya rekaman suara."},
+{char:"noname",text:"🐺 Kau cepat. Bagus."},
+{char:"noname",text:"🐺 Tapi setiap jawaban punya harga."},
+{char:"narrator",text:"📝 Terdengar koordinat baru."}
+]
+},
+
+{
+bg:"bg/carride.jpg",
+lines:[
+{char:"andi",text:"🦁 Ini makin absurd."},
+{char:"ogif",text:"🦊 Tapi seru juga."},
+{char:"andi",text:"🦁 Seru apanya?!"},
+{char:"hany",text:"🐼 Kalian bisa serius dikit gak…"},
+{char:"iky",text:"🐻 Justru itu. Dia ingin kita emosional."}
+]
+},
+
+{
+bg:"bg/hospitalnight.jpg",
+lines:[
+{char:"narrator",text:"📝 Koordinat membawa mereka ke rumah sakit lama."},
+{char:"iky",text:"🐻 Tunggu… ini tempat korban selamat dirawat dulu."},
+{char:"ogif",text:"🦊 Korban yang hilang dari catatan."},
+{char:"andi",text:"🦁 Jadi dia masih hidup?"}
+]
+},
+
+{
+bg:"bg/roomdark.jpg",
+lines:[
+{char:"warga",text:"🙋🏻‍♂️ Jangan… jangan dekat-dekat…"},
+{char:"hany",text:"🐼 Dia ketakutan."},
+{char:"iky",text:"🐻 Kami mau bantu."},
+{char:"warga",text:"🙋🏻‍♂️ Mereka lihat semuanya… mereka pilih dia…"}
+]
+},
+
+{
+bg:"bg/corridor.jpg",
+lines:[
+{char:"narrator",text:"📝 Sebelum penjelasan selesai, listrik padam."},
+{char:"noname",text:"🐺 Kau terlalu jauh masuk."},
+{char:"noname",text:"🐺 Sekarang lihat apakah kau bisa keluar."},
+{char:"narrator",text:"📝 Permainan berlanjut."}
+]
+},
+
+{
+bg:"bg/darkhall.jpg",
+lines:[
+{char:"narrator",text:"📝 Koridor rumah sakit gelap total. Hanya suara napas mereka terdengar."},
+{char:"hany",text:"🐼 Iky… aku gak suka ini…"},
+{char:"iky",text:"🐻 Tetap di belakangku."},
+{char:"andi",text:"🦁 Senter nyala. Kita keluar sekarang."}
+]
+},
+
+{
+bg:"bg/staircase.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka menemukan tangga darurat."},
+{char:"ogif",text:"🦊 Tunggu… ada simbol lagi di dinding."},
+{char:"iky",text:"🐻 Lingkaran dan tiga garis."},
+{char:"iky",text:"🐻 Ini tanda kelompok itu."}
+]
+},
+
+{
+bg:"bg/exitdoor.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka berhasil keluar."},
+{char:"andi",text:"🦁 Korban tadi hilang."},
+{char:"hany",text:"🐼 Dia dibawa lagi…"},
+{char:"iky",text:"🐻 Atau sengaja ditinggalkan sebagai pesan."}
+]
+},
+
+{
+bg:"bg/apartmentnight.jpg",
+lines:[
+{char:"narrator",text:"📝 Malam itu, Iky tidak bisa tidur."},
+{char:"hany",text:"🐼 Kamu mikir terus ya…"},
+{char:"iky",text:"🐻 Aku cuma merasa ini semua diarahkan ke aku."},
+{char:"hany",text:"🐼 Jangan tanggung sendiri."}
+]
+},
+
+{
+bg:"bg/emotionalroom.jpg",
+lines:[
+{char:"hany",text:"🐼 Aku selalu ikut bukan karena lemah…"},
+{char:"hany",text:"🐼 Tapi karena aku peduli sama kamu."},
+{char:"iky",text:"🐻 ..."},
+{char:"iky",text:"🐻 Terima kasih udah tetap di sini."}
+]
+},
+
+{
+bg:"bg/policeoffice.jpg",
+lines:[
+{char:"andi",text:"🦁 Ada data finansial korban."},
+{char:"ogif",text:"🦊 Semuanya pernah ikut seminar riset yang sama."},
+{char:"iky",text:"🐻 Siapa penyelenggaranya?"},
+{char:"andi",text:"🦁 Yayasan anonim."}
+]
+},
+
+{
+bg:"bg/computerhack.jpg",
+lines:[
+{char:"narrator",text:"📝 Ogif menelusuri arsip digital lama."},
+{char:"ogif",text:"🦊 Ketemu."},
+{char:"ogif",text:"🦊 Yayasan itu bubar 10 tahun lalu."},
+{char:"iky",text:"🐻 Tapi eksperimennya lanjut."}
+]
+},
+
+{
+bg:"bg/library.jpg",
+lines:[
+{char:"narrator",text:"📝 Iky menemukan jurnal penelitian."},
+{char:"iky",text:"🐻 'Pengujian respon manusia terhadap tekanan moral'."},
+{char:"hany",text:"🐼 Itu kedengerannya gak manusiawi."},
+{char:"iky",text:"🐻 Karena memang bukan."}
+]
+},
+
+{
+bg:"bg/messagealert.jpg",
+lines:[
+{char:"narrator",text:"📝 Ponsel Iky berbunyi."},
+{char:"noname",text:"🐺 Kau membaca sejarah kami."},
+{char:"noname",text:"🐺 Sekarang rasakan bagianmu."},
+{char:"narrator",text:"📝 Foto Hany terlampir."}
+]
+},
+
+{
+bg:"bg/shock.jpg",
+lines:[
+{char:"iky",text:"🐻 Apa?!"},
+{char:"hany",text:"🐼 Itu fotoku tadi sore…"},
+{char:"andi",text:"🦁 Dia ngawasin kita sekarang."},
+{char:"narrator",text:"📝 Permainan berubah menjadi personal."}
+]
+},
+
+{
+bg:"bg/anxiousnight.jpg",
+lines:[
+{char:"narrator",text:"📝 Malam terasa lebih berat dari biasanya."},
+{char:"hany",text:"🐼 Iky… dia punya fotoku…"},
+{char:"iky",text:"🐻 Aku gak akan biarin dia sentuh kamu."},
+{char:"hany",text:"🐼 Jangan nekat ya…"}
+]
+},
+
+{
+bg:"bg/policeboard.jpg",
+lines:[
+{char:"andi",text:"🦁 Kita butuh strategi, bukan emosi."},
+{char:"iky",text:"🐻 Dia udah masuk kehidupan kita."},
+{char:"ogif",text:"🦊 Justru itu dia mau kamu terpancing."},
+{char:"iky",text:"🐻 ..."}
+]
+},
+
+{
+bg:"bg/cafequiet.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka berhenti sejenak di kafe sepi."},
+{char:"andi",text:"🦁 Kopi hitam."},
+{char:"ogif",text:"🦊 Kamu gak pernah tidur ya."},
+{char:"andi",text:"🦁 Kasus belum selesai."}
+]
+},
+
+{
+bg:"bg/cafequiet.jpg",
+lines:[
+{char:"ogif",text:"🦊 Kamu terlalu keras sama diri sendiri."},
+{char:"andi",text:"🦁 Kamu juga cerewet."},
+{char:"ogif",text:"🦊 Tapi kamu dengerin."},
+{char:"narrator",text:"📝 Andi tersenyum tipis."}
+]
+},
+
+{
+bg:"bg/homeevening.jpg",
+lines:[
+{char:"hany",text:"🐼 Kamu berubah sejak pesan itu."},
+{char:"iky",text:"🐻 Aku cuma gak mau kehilangan kamu."},
+{char:"hany",text:"🐼 Aku di sini… jangan dorong aku pergi."},
+{char:"iky",text:"🐻 Maaf."}
+]
+},
+
+{
+bg:"bg/filediscovery.jpg",
+lines:[
+{char:"andi",text:"🦁 Ketemu nama donor yayasan lama."},
+{char:"ogif",text:"🦊 Siapa?"},
+{char:"andi",text:"🦁 Mantan pejabat pendidikan."},
+{char:"iky",text:"🐻 Orang yang kelihatan biasa…"}
+]
+},
+
+{
+bg:"bg/streetrain.jpg",
+lines:[
+{char:"narrator",text:"📝 Dalam perjalanan pulang, seseorang mengikuti mereka."},
+{char:"hany",text:"🐼 Ky… ada mobil dari tadi."},
+{char:"iky",text:"🐻 Aku lihat."},
+{char:"narrator",text:"📝 Mobil itu menghilang di tikungan."}
+]
+},
+
+{
+bg:"bg/phonealert.jpg",
+lines:[
+{char:"narrator",text:"📝 Pesan baru masuk."},
+{char:"noname",text:"🐺 Ketakutanmu indah."},
+{char:"noname",text:"🐺 Apakah kau siap memilih?"}
+]
+},
+
+{
+bg:"bg/dilemma.jpg",
+lines:[
+{char:"iky",text:"🐻 Memilih apa…"},
+{char:"noname",text:"🐺 Satu hidup… atau sepuluh berikutnya."},
+{char:"hany",text:"🐼 Dia gila…"},
+{char:"andi",text:"🦁 Ini ancaman lanjutan."}
+]
+},
+
+{
+bg:"bg/darkresolve.jpg",
+lines:[
+{char:"narrator",text:"📝 Iky menatap layar lama."},
+{char:"iky",text:"🐻 Kalau ini permainanmu…"},
+{char:"iky",text:"🐻 Aku akan main sampai akhir."},
+{char:"narrator",text:"📝 Tanpa mereka sadar — langkah berikutnya sudah menunggu."}
+]
+},
+
+{
+bg:"bg/rainstreet.jpg",
+lines:[
+{char:"narrator",text:"📝 Hujan turun tanpa jeda. Kota terasa lebih dingin."},
+{char:"iky",text:"🐻 Ancaman dia bukan main-main."},
+{char:"hany",text:"🐼 Aku gak suka perasaan ini…"},
+{char:"iky",text:"🐻 Tetap di dekatku."}
+]
+},
+
+{
+bg:"bg/policealert.jpg",
+lines:[
+{char:"andi",text:"🦁 Kita dapat laporan mayat baru."},
+{char:"ogif",text:"🦊 Lokasi gudang lama pinggir kota."},
+{char:"iky",text:"🐻 Dia mulai lagi…"}
+]
+},
+
+{
+bg:"bg/warehouse.jpg",
+lines:[
+{char:"narrator",text:"📝 Bau besi dan lembab menyambut mereka."},
+{char:"warga",text:"🙋🏻‍♂️ Astaga…"},
+{char:"hany",text:"🐼 Jangan lihat…"},
+{char:"iky",text:"🐻 Terlambat…"}
+]
+},
+
+{
+bg:"bg/warehouse.jpg",
+lines:[
+{char:"andi",text:"🦁 Pola sama seperti dulu."},
+{char:"ogif",text:"🦊 Tapi ada simbol baru di lantai."},
+{char:"iky",text:"🐻 Dia ingin kita melihatnya."}
+]
+},
+
+{
+bg:"bg/symbolclose.jpg",
+lines:[
+{char:"narrator",text:"📝 Simbol itu menyerupai lingkaran terpotong."},
+{char:"iky",text:"🐻 Ini bukan random."},
+{char:"andi",text:"🦁 Kamu kenal?"},
+{char:"iky",text:"🐻 Pernah lihat di arsip lama kampus."}
+]
+},
+
+{
+bg:"bg/librarydark.jpg",
+lines:[
+{char:"narrator",text:"📝 Malam itu mereka menyusuri arsip."},
+{char:"hany",text:"🐼 Jangan sendirian ya."},
+{char:"iky",text:"🐻 Tenang."},
+{char:"ogif",text:"🦊 Ketemu file organisasi lama."}
+]
+},
+
+{
+bg:"bg/librarydark.jpg",
+lines:[
+{char:"andi",text:"🦁 Kelompok penelitian psikologi eksperimental."},
+{char:"iky",text:"🐻 Mereka menguji trauma manusia."},
+{char:"hany",text:"🐼 Kedengarannya mengerikan…"}
+]
+},
+
+{
+bg:"bg/revealshock.jpg",
+lines:[
+{char:"narrator",text:"📝 Nama sponsor muncul di dokumen."},
+{char:"iky",text:"🐻 ..."},
+{char:"andi",text:"🦁 Kamu pucat."},
+{char:"iky",text:"🐻 Itu nama orang yang pernah membiayai sekolahku."}
+]
+},
+
+{
+bg:"bg/tensionnight.jpg",
+lines:[
+{char:"hany",text:"🐼 Jadi kamu… terhubung?"},
+{char:"iky",text:"🐻 Aku gak tahu."},
+{char:"ogif",text:"🦊 Ini makin dalam dari dugaan."},
+{char:"andi",text:"🦁 Dan makin berbahaya."}
+]
+},
+
+{
+bg:"bg/unknownwatch.jpg",
+lines:[
+{char:"narrator",text:"📝 Di tempat lain, seseorang mengamati layar."},
+{char:"noname",text:"🐺 Bagus sekali…"},
+{char:"noname",text:"🐺 Kau akhirnya mengingat sedikit."},
+{char:"narrator",text:"📝 Permainan memasuki fase berikutnya."}
+]
+},
+
+{
+bg:"bg/nightroad.jpg",
+lines:[
+{char:"narrator",text:"📝 Malam semakin larut. Kota seperti menahan napas."},
+{char:"iky",text:"🐻 Ada yang gak beres sejak kita lihat dokumen itu."},
+{char:"hany",text:"🐼 Kamu kelihatan gelisah…"},
+{char:"iky",text:"🐻 Aku cuma mencoba mengingat sesuatu."}
+]
+},
+
+{
+bg:"bg/apartment.jpg",
+lines:[
+{char:"narrator",text:"📝 Hany tiba di apartemennya sendirian."},
+{char:"hany",text:"🐼 Harusnya aku gak kepikiran…"},
+{char:"narrator",text:"📝 Ponselnya bergetar."},
+{char:"noname",text:"🐺 Pesan: Jangan percaya siapapun."}
+]
+},
+
+{
+bg:"bg/apartmentdark.jpg",
+lines:[
+{char:"hany",text:"🐼 Siapa ini?!"},
+{char:"noname",text:"🐺 Pesan: Bahkan dia."},
+{char:"narrator",text:"📝 Layar ponsel mati sendiri."}
+]
+},
+
+{
+bg:"bg/policeoffice.jpg",
+lines:[
+{char:"andi",text:"🦁 Ada laporan orang hilang lagi."},
+{char:"ogif",text:"🦊 Lokasinya dekat tempat simbol ditemukan."},
+{char:"iky",text:"🐻 Dia mempersempit lingkaran."}
+]
+},
+
+{
+bg:"bg/abandonedpark.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka menyisir taman kosong."},
+{char:"hany",text:"🐼 Aku merinding…"},
+{char:"iky",text:"🐻 Tetap di belakangku."},
+{char:"andi",text:"🦁 Jejak darah di sini."}
+]
+},
+
+{
+bg:"bg/discovery.jpg",
+lines:[
+{char:"ogif",text:"🦊 Ada tas korban."},
+{char:"iky",text:"🐻 Tunggu… ada rekaman suara."},
+{char:"narrator",text:"📝 Suara diputar."},
+{char:"noname",text:"🐺 Rekaman: Permainan belum selesai."}
+]
+},
+
+{
+bg:"bg/shock.jpg",
+lines:[
+{char:"hany",text:"🐼 Dia selalu selangkah di depan…"},
+{char:"iky",text:"🐻 Bukan… dia mengarahkan kita."},
+{char:"andi",text:"🦁 Jadi kita pionnya?"}
+]
+},
+
+{
+bg:"bg/memoryflash.jpg",
+lines:[
+{char:"narrator",text:"📝 Ingatan samar menghantam Iky."},
+{char:"iky",text:"🐻 Aku pernah ada di fasilitas itu…"},
+{char:"ogif",text:"🦊 Apa maksudmu?"},
+{char:"iky",text:"🐻 Sebagai subjek penelitian."}
+]
+},
+
+{
+bg:"bg/silence.jpg",
+lines:[
+{char:"hany",text:"🐼 Kenapa kamu gak pernah cerita…"},
+{char:"iky",text:"🐻 Karena aku sendiri baru ingat."},
+{char:"andi",text:"🦁 Ini menjelaskan kenapa dia tertarik padamu."}
+]
+},
+
+{
+bg:"bg/monitorwatch.jpg",
+lines:[
+{char:"narrator",text:"📝 Sosok misterius kembali menatap layar."},
+{char:"noname",text:"🐺 Bagus… trauma itu mulai bangkit."},
+{char:"noname",text:"🐺 Mari lihat apakah dia hancur… atau berkembang."}
+]
+},
+
+{
+bg:"bg/rainstreet.jpg",
+lines:[
+{char:"narrator",text:"📝 Hujan turun deras. Malam terasa menekan."},
+{char:"hany",text:"🐼 Iky… kamu benar-benar pernah jadi subjek mereka?"},
+{char:"iky",text:"🐻 Aku gak ingat semuanya… cuma potongan."}
+]
+},
+
+{
+bg:"bg/memorylab.jpg",
+lines:[
+{char:"narrator",text:"📝 Kilatan ingatan muncul lagi."},
+{char:"iky",text:"🐻 Ruangan putih… orang-orang mengamati…"},
+{char:"noname",text:"🐺 Suara samar: Observasi berjalan sesuai rencana."}
+]
+},
+
+{
+bg:"bg/backtostreet.jpg",
+lines:[
+{char:"hany",text:"🐼 Kamu gemetar…"},
+{char:"iky",text:"🐻 Aku gak apa-apa."},
+{char:"narrator",text:"📝 Tapi matanya menunjukkan sebaliknya."}
+]
+},
+
+{
+bg:"bg/policeoffice.jpg",
+lines:[
+{char:"andi",text:"🦁 Kita dapat lokasi baru."},
+{char:"ogif",text:"🦊 Gudang lama di pinggir kota."},
+{char:"iky",text:"🐻 Dia mau kita datang."}
+]
+},
+
+{
+bg:"bg/warehouse.jpg",
+lines:[
+{char:"narrator",text:"📝 Gudang kosong dipenuhi gema langkah mereka."},
+{char:"hany",text:"🐼 Tempat ini menyeramkan…"},
+{char:"andi",text:"🦁 Fokus."}
+]
+},
+
+{
+bg:"bg/cluewall.jpg",
+lines:[
+{char:"ogif",text:"🦊 Lihat ini — simbol lagi."},
+{char:"iky",text:"🐻 Bukan cuma simbol… ini pola koordinat."},
+{char:"andi",text:"🦁 Jadi dia ninggalin peta buatmu?"}
+]
+},
+
+{
+bg:"bg/shadowmove.jpg",
+lines:[
+{char:"narrator",text:"📝 Bayangan bergerak cepat di kejauhan."},
+{char:"hany",text:"🐼 Ada seseorang!"},
+{char:"iky",text:"🐻 HEI!"}
+]
+},
+
+{
+bg:"bg/chase.jpg",
+lines:[
+{char:"narrator",text:"📝 Mereka mengejar — tapi lorong berujung buntu."},
+{char:"andi",text:"🦁 Hilang…"},
+{char:"ogif",text:"🦊 Dia cuma mempermainkan kita lagi."}
+]
+},
+
+{
+bg:"bg/messagefloor.jpg",
+lines:[
+{char:"narrator",text:"📝 Tulisan ditemukan di lantai."},
+{char:"noname",text:"🐺 Tulisan: Seberapa jauh kamu mengenal dirimu sendiri, Iky?"},
+{char:"iky",text:"🐻 …"}
+]
+},
+
+{
+bg:"bg/nightquiet.jpg",
+lines:[
+{char:"hany",text:"🐼 Aku takut kehilangan kamu di permainan ini…"},
+{char:"iky",text:"🐻 Aku gak akan pergi."},
+{char:"narrator",text:"📝 Namun jauh di dalam, Iky mulai meragukan dirinya sendiri."}
+]
+},
+
+{
+bg:"bg/abandonedhouse.jpg",
+lines:[
+{char:"narrator",text:"📝 Rumah tua itu sepi, tapi setiap sudut terasa diawasi."},
+{char:"iky",text:"🐻 Aku merasa… dia tahu semua langkah kita."},
+{char:"hany",text:"🐼 Jangan bilang dia tahu aku ikut juga…"}
+]
+},
+
+{
+bg:"bg/secretroom.jpg",
+lines:[
+{char:"ogif",text:"🦊 Ini… lembaran catatan lama."},
+{char:"andi",text:"🦁 Pola korban… semua ada hubungan dengan Iky."},
+{char:"iky",text:"🐻 Apa maksudnya ini…"}
+]
+},
+
+{
+bg:"bg/basementdark.jpg",
+lines:[
+{char:"noname",text:"🐺 Kau terlalu dekat, Iky."},
+{char:"narrator",text:"📝 Suara dingin menusuk, tapi wajahnya tetap samar."},
+{char:"iky",text:"🐻 Tunjukkan dirimu! Aku gak takut!"}
+]
+},
+
+{
+bg:"bg/panichall.jpg",
+lines:[
+{char:"hany",text:"🐼 Iky! Jangan ikut dia sendiri!"},
+{char:"iky",text:"🐻 Aku harus hadapi ini… untukmu!"},
+{char:"andi",text:"🦁 Jangan nekat, ini jebakan!"},
+{char:"ogif",text:"🦊 Iky… hati-hati!"}
+]
+},
+
+{
+bg:"bg/chase2.jpg",
+lines:[
+{char:"narrator",text:"📝 Lorong berliku, langkah Iky mengejar bayangan."},
+{char:"noname",text:"🐺 Masih banyak teka-teki sebelum kau selamat."},
+{char:"iky",text:"🐻 Aku akan pecahkan semuanya…"}
+]
+},
+
+{
+bg:"bg/revealcorner.jpg",
+lines:[
+{char:"narrator",text:"📝 Tiba-tiba, korban selamat muncul dari bayangan."},
+{char:"hany",text:"🐼 Itu… dia masih hidup!"},
+{char:"iky",text:"🐻 Terima kasih… aku… aku harus menyelesaikan ini."}
+]
+},
+
+{
+bg:"bg/finalconfront.jpg",
+lines:[
+{char:"noname",text:"🐺 Akhirnya kita bertemu, Iky."},
+{char:"iky",text:"🐻 Aku tahu semuanya sekarang."},
+{char:"andi",text:"🦁 Jangan lengah!"},
+{char:"ogif",text:"🦊 Fokus, kita harus amankan dia!"}
+]
+},
+
+{
+bg:"bg/struggle.jpg",
+lines:[
+{char:"narrator",text:"📝 Perkelahian terjadi, Iky hampir jatuh…"},
+{char:"hany",text:"🐼 Iky! Tolong jangan!"}
+]
+},
+
+{
+bg:"bg/grayscale.jpg",
+lines:[
+{char:"narrator",text:"📝 Cahaya memudar, dunia seolah berwarna abu-abu saat Iky nyaris kehilangan nyawa."},
+{char:"iky",text:"🐻 Aku gak boleh… kalah…"}
+]
+},
+
+{
+bg:"bg/aftercredit.jpg",
+lines:[
+{char:"narrator",text:"📝 Semua berhenti sejenak… pembunuh tertangkap, tapi misteri baru menunggu."},
+{char:"hany",text:"🐼 Iky… kita berhasil… tapi… rasanya belum selesai."},
+{char:"iky",text:"🐻 Aku akan selalu bersamamu, Hany."},
+{char:"narrator",text:"📝 Petunjuk tersembunyi menunjukkan bahwa dalang sebenarnya belum muncul…"}
+]
+},
+
+/* =========================
+PART 81 — CINEMATIC BEGIN
+========================= */
+{
+bg:"bg/grayscale.jpg",
+lines:[
+{char:"narrator",text:"📝 Dunia memudar menjadi abu-abu… Iky hampir kehilangan nyawa."},
+{char:"hany",text:"🐼 Iky! Tolong bertahan… Aku tidak bisa kehilanganmu!"}
+]
+},
+
+/* =========================
+PART 82 — SLOW ZOOM + PETIR
+========================= */
+{
+bg:"bg/stormnight.jpg",
+lines:[
+{char:"narrator",text:"📝 Petir menyambar, lorong itu terasa seperti akhir dunia…"},
+{char:"iky",text:"🐻 Aku harus bangkit… demi Hany…"},
+{char:"hany",text:"🐼 Aku tidak akan melepaskanmu, Iky!"}
+]
+},
+
+/* =========================
+PART 83 — TRAGEDI & RESCUE
+========================= */
+{
+bg:"bg/afterfight.jpg",
+lines:[
+{char:"andi",text:"🦁 Cepat tarik dia! Jangan biarkan noname kabur!"},
+{char:"ogif",text:"🦊 Fokus, semua sudah beres… kita aman sekarang."},
+{char:"iky",text:"🐻 Aku… selamat… tapi nyawaku hampir hilang…"},
+{char:"hany",text:"🐼 Iky… jangan pernah pergi lagi."}
+]
+},
+
+/* =========================
+PART 84 — CREDIT ROLL BEGIN
+========================= */
+{
+bg:"bg/blackfade.jpg",
+lines:[
+{char:"narrator",text:"📝 🎬 Season 3 — Credit Roll 🎬"},
+{char:"narrator",text:"🐻 IKY — Pemimpin & Pemecah Teka-teki"},
+{char:"narrator",text:"🐼 HANY — Tulus, Penuh Perhatian, dan Tulus"},
+{char:"narrator",text:"🦁 ANDI — Detektif Pekerja Keras & Lucu"},
+{char:"narrator",text:"🦊 OGIF — Tegas, Cerewet, & Setia"},
+{char:"narrator",text:"🐺 NO NAME — Pembunuh Misterius"},
+{char:"narrator",text:"🙋🏻‍♂️ WARGA — Memberi Petunjuk & Atmosfer"},
+{char:"narrator",text:"📝 NARRATOR — Menjelaskan Kisah Misteri"}
+]
+},
+
+/* =========================
+PART 85 — AFTER CREDIT TEASER
+========================= */
+{
+bg:"bg/mysteriousshadow.jpg",
+lines:[
+{char:"narrator",text:"📝 Namun, di balik semua ini… dalang sebenarnya belum muncul."},
+{char:"hany",text:"🐼 Iky… ada sesuatu yang belum kita ketahui…"},
+{char:"iky",text:"🐻 Aku akan siap, apapun yang menunggu kita…"},
+{char:"narrator",text:"📝 🔥 Season 4 akan datang. Siapkan diri untuk misteri lebih gelap dan teka-teki yang lebih sulit…"}
+]
+}
+
+]; // nanti isi cerita bisa dilanjutkan
+ 
+let p=0,l=0;
+
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
+  }
+}
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },50);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p]?.lines[l];
+  if(!line) return;
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(!bubble) return;
+  if(mood(line.text)){
+    rain(true);
+    jumpscare();
+    if(line.char=="noname"){ setTimeout(()=>{jumpscare()},300); }
+  } else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  if(parts[p]) document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
+
+render();
+</script>
+
+<!-- ======= FOOTER CINEMATIC PRO ======= -->
+<div id="footerCine">
+
+  <canvas id="noise"></canvas>
+
+  <div class="eye">👁</div>
+
+  <div class="seasonBox">
+    <h3 id="seasonText">SEASON BERIKUTNYA</h3>
+
+    <div class="loadingBar">
+      <div class="loadingFill"></div>
+    </div>
+
+    <p class="hint">
+      Misteri belum berakhir…<br>
+      Seseorang masih mengamati setiap langkahmu.
+    </p>
+  </div>
+
+</div>
+
+<audio id="ambience" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3" type="audio/mpeg">
+</audio>
+
+<style>
+#footerCine{
+  position:relative;
+  max-width:900px;
+  margin:30px auto;
+  padding:26px;
+  border-radius:18px;
+  background:#000;
+  color:white;
+  overflow:hidden;
+}
+
+/* STATIC NOISE */
+#noise{
+  position:absolute;
+  inset:0;
+  opacity:.15;
+  z-index:0;
+}
+
+/* EYE */
+.eye{
+  position:absolute;
+  font-size:42px;
+  left:50%;
+  top:20px;
+  transform:translateX(-50%);
+  animation:blink 5s infinite;
+  z-index:1;
+}
+
+/* CONTENT */
+.seasonBox{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.seasonBox h3{
+  letter-spacing:3px;
+  font-weight:800;
+  margin-bottom:16px;
+  animation:glitch 3s infinite;
+}
+
+.loadingBar{
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  overflow:hidden;
+  margin:14px 0;
+}
+
+.loadingFill{
+  height:100%;
+  width:0%;
+  background:#7b5cff;
+  animation:loadLoop 4s linear infinite;
+}
+
+.hint{
+  opacity:.7;
+  font-size:.9rem;
+}
+
+/* Animations */
+@keyframes loadLoop{
+  0%{width:0}
+  50%{width:100%}
+  100%{width:0}
+}
+
+@keyframes blink{
+  0%,90%,100%{opacity:1}
+  95%{opacity:0}
+}
+
+@keyframes glitch{
+  0%{text-shadow:2px 0 red}
+  25%{text-shadow:-2px 0 blue}
+  50%{text-shadow:2px 0 purple}
+  75%{text-shadow:-2px 0 cyan}
+  100%{text-shadow:none}
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .eye{font-size:30px}
+}
+</style>
+
+<script>
+/* ===== TEXT ROTATE ===== */
+const text=[
+"SEASON BERIKUTNYA",
+"COMING SOON",
+"STORY LOADING",
+"PLEASE WAIT..."
+];
+let idx=0;
+setInterval(()=>{
+  document.getElementById("seasonText").textContent=text[idx];
+  idx=(idx+1)%text.length;
+},2500);
+
+/* ===== STATIC NOISE ===== */
+const canvas=document.getElementById("noise");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+}
+window.onresize=resize;
+resize();
+
+function noise(){
+  const img=ctx.createImageData(canvas.width,canvas.height);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=Math.random()*255;
+    img.data[i]=v;
+    img.data[i+1]=v;
+    img.data[i+2]=v;
+    img.data[i+3]=30;
+  }
+  ctx.putImageData(img,0,0);
+  requestAnimationFrame(noise);
+}
+noise();
+
+/* ===== AUTO AMBIENT SOUND ===== */
+window.addEventListener("click",()=>{
+  document.getElementById("ambience").play();
+},{once:true});
+</script>
+
+</body>
+</html>
+
