@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mysteri Pembunuhan Berantai</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#0f061a;color:white;overflow-y:auto;min-height:100vh;}
+
+/* BACKGROUND */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(2px);transition:1.2s;z-index:-3}
+#overlay{position:fixed;inset:0;background:linear-gradient(rgba(20,10,40,.45),rgba(10,5,20,.7));z-index:-2}
+
+/* WEATHER */
+#weather{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.drop{position:absolute;top:-20px;width:2px;height:18px;background:rgba(200,200,255,.6);animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(120vh)}}
+
+/* APP */
+#app{
+  width:95%;
+  max-width:900px;
+  margin:20px auto;
+  padding:20px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:idle 8s ease-in-out infinite;
+}
+@keyframes idle{50%{transform:scale(1.015)}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* SCENE */
+.scene{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.charRow{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.charBox{text-align:center;width:60px;flex-shrink:0;}
+.char{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:0 8px 20px rgba(0,0,0,.5)
+}
+.charName{font-size:.65rem;opacity:.75;margin-top:3px;letter-spacing:.5px}
+
+/* Karakter warna */
+.bear{background:linear-gradient(145deg,#8b5a2b,#5a3a1a)}
+.lion{background:linear-gradient(145deg,#f5a623,#c97a12)}
+.panda{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.fox{background:linear-gradient(145deg,#ff7a18,#ff3d00)}
+.wolf{background:linear-gradient(145deg,#fff,#ccc);color:#000}
+.ghost{background:linear-gradient(145deg,#555,#222)}
+
+.bubble{
+  flex:1;background:rgba(0,0,0,.35);
+  border-radius:12px;padding:10px 12px;
+  line-height:1.5;opacity:0;transform:translateY(4px);
+  transition:.4s ease;
+  word-break:break-word;
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+button,label{
+  padding:6px 14px;border:none;border-radius:999px;
+  background:#7b5cff;color:white;font-weight:bold;cursor:pointer;font-size:.85rem
+}
+
+/* JUMPSCARE */
+#flash{
+  position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:999;
+}
+.flash{animation:flash .25s}
+@keyframes flash{50%{opacity:1}}
+
+/* GRAYSCALE */
+.grayscale{filter:grayscale(100%)}
+
+/* Responsif HP */
+@media(max-width:600px){
+  .charBox{width:50px;}
+  .char{width:50px;height:50px;font-size:1.5rem;}
+  .bubble{font-size:.85rem;padding:8px 10px;}
+  .controls{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<div id="weather"></div>
+<div id="flash"></div>
+
+<div id="app">
+  <h2 style="text-align:center">🌑 Mysteri Pembunuhan Berantai 🌑</h2>
+
+  <div class="scene">
+
+    <!-- IKY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char bear" id="ikyChar">🐻</div>
+        <div class="charName">IKY</div>
+      </div>
+      <div class="bubble" id="ikyBubble"></div>
+    </div>
+
+    <!-- ANDI -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char lion" id="andiChar">🦁</div>
+        <div class="charName">ANDI</div>
+      </div>
+      <div class="bubble" id="andiBubble"></div>
+    </div>
+
+    <!-- HANY -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char panda" id="hanyChar">🐼</div>
+        <div class="charName">HANY</div>
+      </div>
+      <div class="bubble" id="hanyBubble"></div>
+    </div>
+
+    <!-- OGIF -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char fox" id="ogifChar">🦊</div>
+        <div class="charName">OGIF</div>
+      </div>
+      <div class="bubble" id="ogifBubble"></div>
+    </div>
+
+    <!-- NO NAME -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char wolf" id="tetuaChar">🐺</div>
+        <div class="charName">NO NAME</div>
+      </div>
+      <div class="bubble" id="nonameBubble"></div>
+    </div>
+
+    <!-- WARGA -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char ghost" id="suanggiChar">🙋🏻‍♂️</div>
+        <div class="charName">WARGA</div>
+      </div>
+      <div class="bubble" id="wargaBubble"></div>
+    </div>
+
+    <!-- NARRATOR -->
+    <div class="charRow">
+      <div class="charBox">
+        <div class="char" id="narratorChar">📝</div>
+        <div class="charName">NARRATOR</div>
+      </div>
+      <div class="bubble" id="narratorBubble"></div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="prevPart()">⟵</button>
+
+    <label>
+      🎵 Pilih Musik
+      <input type="file" accept="audio/*" hidden onchange="loadMusic(this)">
+    </label>
+
+    <button onclick="nextPart()">⟶</button>
+  </div>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<script>
+const bgm=document.getElementById("bgm");
+const savedMusic=localStorage.getItem("bgmSrc");
+if(savedMusic){bgm.src=savedMusic}
+
+function loadMusic(input){
+  const file=input.files[0];
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  bgm.src=url;
+  bgm.play();
+  localStorage.setItem("bgmSrc",url);
+}
+
+const parts = [
+  // =========================
+  // PART 1 — PEMBUKAAN SEASON 4
+  // =========================
+  {
+    bg: "bg/office_day.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Setelah lulus, Iky dan Hany kini bekerja sebagai junior di biro Andi & Ogif. Tekad mereka besar, dan tantangan menanti." },
+      { char: "iky", text: "🐻 Hany, siap untuk kasus pertama kita?" },
+      { char: "hany", text: "🐼 Selalu siap… tapi jangan terlalu santai, ya." },
+      { char: "andi", text: "🦁 Junior, kalian bakal kerja keras. Jangan sampai salah langkah." },
+      { char: "ogif", text: "🦊 Aku harap kalian bisa mengikuti ritme kami." }
+    ]
+  },
+
+  // =========================
+  // PART 2 — LAPORAN PERTAMA
+  // =========================
+  {
+    bg: "bg/crime_scene_night.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Malam ini ada laporan korban pria dewasa di gudang tua." },
+      { char: "iky", text: "🐻 Hati-hati, Hany. Perhatikan setiap detail." },
+      { char: "hany", text: "🐼 Aku lihat simbol aneh di lantai…" },
+      { char: "ogif", text: "🦊 Bagus, Hany. Catat semuanya, jangan sampai terlewat." },
+      { char: "andi", text: "🦁 Simbol ini… mirip dengan kasus lama." }
+    ]
+  },
+
+  // =========================
+  // PART 3 — ANALISIS
+  // =========================
+  {
+    bg: "bg/office_day2.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Pola ini… sepertinya pembunuh sengaja memancing kita." },
+      { char: "hany", text: "🐼 Aku nggak suka perasaan ini… terasa berbahaya." },
+      { char: "ogif", text: "🦊 Iky, kamu yakin bisa menebak petunjuknya?" },
+      { char: "andi", text: "🦁 Jangan terlalu percaya insting kalian. Kita butuh bukti." }
+    ]
+  },
+
+  // =========================
+  // PART 4 — KORBAN ANAK
+  // =========================
+  {
+    bg: "bg/crime_scene_child.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Korban anak kecil ditemukan di taman kota. Luka-lukanya misterius." },
+      { char: "hany", text: "🐼 Iky… kita harus cepat!" },
+      { char: "iky", text: "🐻 Tenang… amati dulu. Setiap detail penting." },
+      { char: "ogif", text: "🦊 Hany, jangan terlalu dekat. Bisa berbahaya." },
+      { char: "andi", text: "🦁 Aku nggak percaya ada orang gila begini di kota." }
+    ]
+  },
+
+  // =========================
+  // PART 5 — PETUNJUK PERTAMA
+  // =========================
+  {
+    bg: "bg/evidence_board.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Simbol yang sama muncul di setiap TKP. Pembunuh sengaja meninggalkannya." },
+      { char: "hany", text: "🐼 Aku baru sadar… ada pola tertentu dalam pemilihan korban." },
+      { char: "ogif", text: "🦊 Setuju, kita bisa gunakan ini untuk prediksi selanjutnya." },
+      { char: "andi", text: "🦁 Tapi pola ini… terlalu rapi. Tidak mudah ditebak." },
+      { char: "narrator", text: "📝 Iky dan Hany mulai merasakan ketegangan yang berbeda kali ini." }
+    ]
+  },
+
+  // =========================
+  // PART 6 — KONFRONTASI WARGA
+  // =========================
+  {
+    bg: "bg/city_night2.jpg",
+    lines: [
+      { char: "warga", text: "🙋🏻‍♂️ Jangan ikut campur, ini urusan berbahaya!" },
+      { char: "iky", text: "🐻 Kami harus tahu kebenaran, tolong beri petunjuk." },
+      { char: "hany", text: "🐼 Jangan khawatir, kami hanya ingin membantu." },
+      { char: "andi", text: "🦁 Sebenarnya ada saksi yang takut bicara." },
+      { char: "ogif", text: "🦊 Kita harus pastikan mereka aman sebelum tanya lebih jauh." }
+    ]
+  },
+
+  // =========================
+  // PART 7 — KORBAN WANITA
+  // =========================
+  {
+    bg: "bg/crime_scene_woman.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Korban wanita dewasa ditemukan di rumah kosong. Lukanya berbeda dengan korban sebelumnya." },
+      { char: "iky", text: "🐻 Pembunuh ini… semakin berani." },
+      { char: "hany", text: "🐼 Aku merasa ada yang memantau kita…" },
+      { char: "ogif", text: "🦊 Tetap fokus, jangan biarkan rasa takut menguasai." },
+      { char: "andi", text: "🦁 Kita butuh bukti nyata, bukan hanya insting." }
+    ]
+  },
+
+  // =========================
+  // PART 8 — PETUNJUK BARU
+  // =========================
+  {
+    bg: "bg/office_day3.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Lihat ini… ada jejak sepatu dan sidik jari. Bisa jadi petunjuk." },
+      { char: "hany", text: "🐼 Aku bantu catat dan foto semua bukti." },
+      { char: "ogif", text: "🦊 Bagus. Hany mulai terlihat lebih berani." },
+      { char: "andi", text: "🦁 Kita harus konfirmasi identitas korban dengan cepat." }
+    ]
+  },
+
+  // =========================
+  // PART 9 — MALAM PENUH TEKA-TEKI
+  // =========================
+  {
+    bg: "bg/night_street.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Malam ini kota sunyi. Namun misteri semakin menumpuk." },
+      { char: "iky", text: "🐻 Hany, tetap di dekatku." },
+      { char: "hany", text: "🐼 Aku selalu di sampingmu…" },
+      { char: "andi", text: "🦁 Ada laporan korban baru, mari kita periksa." },
+      { char: "ogif", text: "🦊 Iky, ini mulai rumit. Tapi kalian berdua hebat." }
+    ]
+  },
+
+  // =========================
+  // PART 10 — KONFLIK INTERNAL
+  // =========================
+  {
+    bg: "bg/office_night.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Ogif, kita harus koordinasi lebih baik. Jangan sampai ada kesalahan." },
+      { char: "ogif", text: "🦊 Tenang Iky, aku tahu tanggung jawabku." },
+      { char: "andi", text: "🦁 Aku lihat Hany mulai adaptasi cepat." },
+      { char: "hany", text: "🐼 Aku ingin membantu… aku bisa lebih dari yang kalian kira." },
+      { char: "narrator", text: "📝 Tekanan dan misteri membuat semua semakin tegang." }
+    ]
+  },
+
+  // =========================
+  // PART 11 — KORBAN ANAK LAIN
+  // =========================
+  {
+    bg: "bg/crime_scene_child2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Korban anak kedua ditemukan di gudang tua lain. Pola pembunuhan semakin rumit." },
+      { char: "iky", text: "🐻 Hany, ini tidak biasa… kita harus fokus." },
+      { char: "hany", text: "🐼 Aku akan bantu cari petunjuk di sekitar." },
+      { char: "ogif", text: "🦊 Bagus, Hany. Semakin percaya diri." },
+      { char: "andi", text: "🦁 Kita hampir mendekati pola pelaku." }
+    ]
+  },
+
+  // =========================
+  // PART 12 — PERTEMUAN WARGA
+  // =========================
+  {
+    bg: "bg/city_day.jpg",
+    lines: [
+      { char: "warga", text: "🙋🏻‍♂️ Aku lihat sesuatu yang mencurigakan malam tadi…" },
+      { char: "iky", text: "🐻 Ceritakan semuanya, jangan sembunyi informasi." },
+      { char: "hany", text: "🐼 Kita harus cepat sebelum korban berikutnya." },
+      { char: "andi", text: "🦁 Bisa jadi petunjuk utama kita." },
+      { char: "ogif", text: "🦊 Kita harus tetap hati-hati." }
+    ]
+  },
+
+  // =========================
+  // PART 13 — PETUNJUK SIMBOL
+  // =========================
+  {
+    bg: "bg/evidence_board2.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Simbol ini muncul di semua TKP. Pembunuh sengaja meninggalkan jejak untuk kita." },
+      { char: "hany", text: "🐼 Aku catat semuanya, termasuk posisi korban." },
+      { char: "ogif", text: "🦊 Bagus Hany, ini membuat kita lebih dekat ke pelaku." },
+      { char: "andi", text: "🦁 Pola korban mulai terlihat. Ini krusial." }
+    ]
+  },
+
+  // =========================
+  // PART 14 — TEKA TEKI
+  // =========================
+  {
+    bg: "bg/night_street2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Malam ini hujan deras. Kota menjadi gelap dan misteri semakin pekat." },
+      { char: "iky", text: "🐻 Hany, jangan jauh-jauh." },
+      { char: "hany", text: "🐼 Aku ikut di belakangmu, Iky." },
+      { char: "andi", text: "🦁 Ada jejak kaki basah menuju rumah kosong." },
+      { char: "ogif", text: "🦊 Kita harus periksa semua ruangan." }
+    ]
+  },
+
+  // =========================
+  // PART 15 — KORBAN WANITA LAIN
+  // =========================
+  {
+    bg: "bg/crime_scene_woman2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Korban wanita ketiga ditemukan, kali ini di taman kota." },
+      { char: "iky", text: "🐻 Setiap korban berbeda… tapi ada satu benang merah." },
+      { char: "hany", text: "🐼 Aku lihat sesuatu… simbol yang sama." },
+      { char: "andi", text: "🦁 Kita harus hubungkan semua titik bukti." },
+      { char: "ogif", text: "🦊 Semakin dekat dengan pola pelaku." }
+    ]
+  },
+
+  // =========================
+  // PART 16 — KONFRONTASI NONAME
+  // =========================
+  {
+    bg: "bg/abandoned_building.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menghentikanku?" },
+      { char: "iky", text: "🐻 Tidak, kami akan menangkapmu!" },
+      { char: "hany", text: "🐼 Jangan buat kesalahan, kami bisa kerjasama!" },
+      { char: "andi", text: "🦁 Fokus, jangan emosional." },
+      { char: "ogif", text: "🦊 Iky, Hany… ikuti aku!" }
+    ]
+  },
+
+  // =========================
+  // PART 17 — STRATEGI TIM
+  // =========================
+  {
+    bg: "bg/office_night2.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Kita harus koordinasi. Jangan sampai pelaku kabur." },
+      { char: "hany", text: "🐼 Aku bisa bantu pantau bukti digital." },
+      { char: "ogif", text: "🦊 Aku akan kontrol lapangan." },
+      { char: "andi", text: "🦁 Aku tetap backup kalian." },
+      { char: "narrator", text: "📝 Setiap anggota tim punya peran penting malam ini." }
+    ]
+  },
+
+  // =========================
+  // PART 18 — MALAM PENENTUAN
+  // =========================
+  {
+    bg: "bg/night_street3.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Hujan deras, lampu jalan redup. Pelaku terlihat bergerak." },
+      { char: "iky", text: "🐻 Hany, tetap dekatku." },
+      { char: "hany", text: "🐼 Aku di sampingmu… siap kapan saja." },
+      { char: "andi", text: "🦁 Aku lihat gerakannya. Tunggu tanda!" },
+      { char: "ogif", text: "🦊 Fokus, jangan lengah." }
+    ]
+  },
+
+  // =========================
+  // PART 19 — KONFRONTASI TERAKHIR
+  // =========================
+  {
+    bg: "bg/abandoned_building2.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menangkapku?" },
+      { char: "iky", text: "🐻 Tidak, ini terakhir kali kau kabur!" },
+      { char: "hany", text: "🐼 Jangan sakiti siapa pun lagi!" },
+      { char: "andi", text: "🦁 Koordinasi sekarang!" },
+      { char: "ogif", text: "🦊 Fokus Iky, Hany… ikuti aku!" }
+    ]
+  },
+
+  // =========================
+  // PART 20 — ENDING BITTERSWEET
+  // =========================
+  {
+    bg: "bg/office_day4.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Setelah penangkapan, kota kembali tenang. Namun ketegangan dan trauma masih terasa." },
+      { char: "iky", text: "🐻 Hany, kita berhasil. Tapi aku masih harus belajar lebih banyak." },
+      { char: "hany", text: "🐼 Aku bangga padamu, Iky… dan aku juga lebih berani sekarang." },
+      { char: "ogif", text: "🦊 Kerja bagus semua, ini baru awal dari karier kalian." },
+      { char: "andi", text: "🦁 Jangan lengah. Dunia ini masih penuh misteri." }
+    ]
+  },
+
+   // =========================
+  // PART 21 — KASUS SAMPINGAN
+  // =========================
+  {
+    bg: "bg/city_day2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Hari berikutnya, kasus baru muncul: seorang pria dewasa hilang secara misterius." },
+      { char: "iky", text: "🐻 Hany, kita harus pisahkan tugas. Aku cek lokasi terakhir korban." },
+      { char: "hany", text: "🐼 Aku akan telusuri saksi di sekitar." },
+      { char: "ogif", text: "🦊 Jangan lupa koordinasi dengan Andi." },
+      { char: "andi", text: "🦁 Aku pantau CCTV dan laporan warga." }
+    ]
+  },
+
+  // =========================
+  // PART 22 — PETUNJUK AWAL
+  // =========================
+  {
+    bg: "bg/crime_scene_day.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Aku menemukan catatan aneh di dekat TKP. Ada angka dan simbol." },
+      { char: "iky", text: "🐻 Baik, Hany. Catat semuanya. Ini bisa jadi petunjuk." },
+      { char: "ogif", text: "🦊 Simbol ini mirip dengan kasus sebelumnya." },
+      { char: "andi", text: "🦁 Kalau benar, pelaku mungkin ingin kita fokus di sini." },
+      { char: "narrator", text: "📝 Hany mulai menunjukkan ketajaman observasi yang mengejutkan Iky." }
+    ]
+  },
+
+  // =========================
+  // PART 23 — PENGINTAIAN
+  // =========================
+  {
+    bg: "bg/night_street4.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany, tetap di belakangku. Jangan lengah." },
+      { char: "hany", text: "🐼 Aku di sampingmu… siap menghadapi apapun." },
+      { char: "andi", text: "🦁 Aku sudah mengatur pengawasan. Pastikan tidak ada yang terlewat." },
+      { char: "ogif", text: "🦊 Iky, perhatikan setiap gerakan sekitar." },
+      { char: "narrator", text: "📝 Malam ini terasa berbeda. Ada perasaan seolah pelaku mengintai mereka." }
+    ]
+  },
+
+  // =========================
+  // PART 24 — PETUNJUK TERSEMBUNYI
+  // =========================
+  {
+    bg: "bg/warehouse_interior.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Aku menemukan lubang di lantai, seperti tempat persembunyian." },
+      { char: "iky", text: "🐻 Bagus Hany! Kita cek perlahan, jangan gegabah." },
+      { char: "ogif", text: "🦊 Perhatikan setiap sudut, bisa jadi jebakan." },
+      { char: "andi", text: "🦁 Siapkan kamera dan komunikasi, jangan sampai kejutan." },
+      { char: "narrator", text: "📝 Setiap langkah mereka dipenuhi ketegangan dan kewaspadaan." }
+    ]
+  },
+
+  // =========================
+  // PART 25 — KORBAN DITEMUKAN HIDUP
+  // =========================
+  {
+    bg: "bg/warehouse_interior2.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany… lihat! Ada korban yang masih hidup!" },
+      { char: "hany", text: "🐼 Aku akan bantu dia keluar!" },
+      { char: "ogif", text: "🦊 Pastikan aman. Kita harus evakuasi korban." },
+      { char: "andi", text: "🦁 Aku pantau pelaku, jangan sampai kabur." },
+      { char: "narrator", text: "📝 Kejadian ini membuat tim lebih percaya diri, tapi risiko tetap besar." }
+    ]
+  },
+
+  // =========================
+  // PART 26 — PELACAKAN
+  // =========================
+  {
+    bg: "bg/city_night3.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Jejak pelaku terlihat menuju gedung tua." },
+      { char: "hany", text: "🐼 Aku lihat sesuatu… sebuah simbol di dinding." },
+      { char: "ogif", text: "🦊 Simbol ini menjadi tanda bahwa pelaku sengaja meninggalkan petunjuk." },
+      { char: "andi", text: "🦁 Jangan lengah, ini bisa jebakan." },
+      { char: "narrator", text: "📝 Setiap simbol menambah teka-teki dan ketegangan malam itu." }
+    ]
+  },
+
+  // =========================
+  // PART 27 — KONFRONTASI PERTAMA
+  // =========================
+  {
+    bg: "bg/abandoned_building3.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menebakku?" },
+      { char: "iky", text: "🐻 Tidak, kami akan hentikanmu!" },
+      { char: "hany", text: "🐼 Aku bantu Iky!" },
+      { char: "ogif", text: "🦊 Jangan gegabah. Tetap di posisi." },
+      { char: "andi", text: "🦁 Koordinasi sekarang!" }
+    ]
+  },
+
+  // =========================
+  // PART 28 — PERTOLONGAN HANY
+  // =========================
+  {
+    bg: "bg/abandoned_building4.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Cepat! Aku lihat korban hampir terjatuh dari lantai atas!" },
+      { char: "iky", text: "🐻 Hany… hati-hati!" },
+      { char: "ogif", text: "🦊 Hany, tarik korban dengan aman!" },
+      { char: "andi", text: "🦁 Aku bantu kontrol pelaku dari luar." },
+      { char: "narrator", text: "📝 Hany menyelamatkan korban dengan keberanian yang luar biasa." }
+    ]
+  },
+
+  // =========================
+  // PART 29 — PETUNJUK KUNCI
+  // =========================
+  {
+    bg: "bg/evidence_board3.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Simbol ini ternyata kode lokasi persembunyian pelaku!" },
+      { char: "hany", text: "🐼 Aku bisa bantu pecahkan kodenya." },
+      { char: "ogif", text: "🦊 Hebat, Hany. Kalian mulai bekerja seperti tim nyata." },
+      { char: "andi", text: "🦁 Pastikan koordinasi tetap terjaga." },
+      { char: "narrator", text: "📝 Akhirnya mereka menemukan jalur menuju pelaku." }
+    ]
+  },
+
+  // =========================
+  // PART 30 — KEPANIKAN PELAKU
+  // =========================
+  {
+    bg: "bg/warehouse_interior3.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Tidak… mereka menemukan jalanku!" },
+      { char: "iky", text: "🐻 Sekarang kau tak bisa kabur!" },
+      { char: "hany", text: "🐼 Jangan sakiti siapapun lagi!" },
+      { char: "ogif", text: "🦊 Fokus, jangan lengah." },
+      { char: "andi", text: "🦁 Semua jalur sudah terpantau." }
+    ]
+  },
+
+  // =========================
+  // PART 31 — TRAGEDI KECIL
+  // =========================
+  {
+    bg: "bg/night_street5.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Hujan deras malam itu membuat Iky terpeleset. Hany segera menolongnya." },
+      { char: "hany", text: "🐼 Aku di sini, Iky! Pegang tanganku!" },
+      { char: "iky", text: "🐻 Terima kasih, Hany… kau hebat." },
+      { char: "ogif", text: "🦊 Hati-hati keduanya, jangan lengah." },
+      { char: "andi", text: "🦁 Kita harus cepat, pelaku tidak menunggu." }
+    ]
+  },
+
+  // =========================
+  // PART 32 — PELACAKAN TERUS
+  // =========================
+  {
+    bg: "bg/city_night4.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Jejak kaki basah mengarah ke pabrik tua." },
+      { char: "hany", text: "🐼 Aku lihat lampu yang berkedip… mungkin jebakan." },
+      { char: "ogif", text: "🦊 Waspada, jangan lengah!" },
+      { char: "andi", text: "🦁 Aku pantau CCTV dari jarak aman." },
+      { char: "narrator", text: "📝 Mereka semakin dekat dengan pelaku, tapi bahaya selalu mengintai." }
+    ]
+  },
+
+  // =========================
+  // PART 33 — KORBAN TERBARU
+  // =========================
+  {
+    bg: "bg/crime_scene_adult2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Korban pria dewasa ketiga ditemukan. Luka dan simbol sama dengan sebelumnya." },
+      { char: "iky", text: "🐻 Pelaku sengaja menunjukkan tanda bahwa dia menantang kita." },
+      { char: "hany", text: "🐼 Aku akan catat posisi dan simbolnya." },
+      { char: "ogif", text: "🦊 Hany mulai semakin berani dalam mengambil peran." },
+      { char: "andi", text: "🦁 Kita hampir punya pola yang jelas." }
+    ]
+  },
+
+  // =========================
+  // PART 34 — KONFRONTASI DALAM PABRIK
+  // =========================
+  {
+    bg: "bg/factory_interior.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menangkapku?" },
+      { char: "iky", text: "🐻 Tidak! Kau tidak bisa kabur lagi!" },
+      { char: "hany", text: "🐼 Aku bantu Iky!" },
+      { char: "ogif", text: "🦊 Tetap di posisi, jangan gegabah." },
+      { char: "andi", text: "🦁 Semua jalur terpantau, pelaku terkepung." }
+    ]
+  },
+
+  // =========================
+  // PART 35 — PERTOLONGAN CEPAT HANY
+  // =========================
+  {
+    bg: "bg/factory_interior2.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Cepat! Ada korban hampir terjatuh dari lantai atas!" },
+      { char: "iky", text: "🐻 Hany… hati-hati!" },
+      { char: "ogif", text: "🦊 Tarik korban dengan aman!" },
+      { char: "andi", text: "🦁 Aku bantu dari luar." },
+      { char: "narrator", text: "📝 Keberanian Hany menyelamatkan nyawa korban semakin membuatnya diperhitungkan." }
+    ]
+  },
+
+  // =========================
+  // PART 36 — PETUNJUK TERAKHIR
+  // =========================
+  {
+    bg: "bg/evidence_board4.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Simbol terakhir ini mengarah langsung ke lokasi persembunyian utama pelaku!" },
+      { char: "hany", text: "🐼 Aku bisa bantu buka kode tersembunyi ini." },
+      { char: "ogif", text: "🦊 Hebat Hany, kalian makin kompak." },
+      { char: "andi", text: "🦁 Fokus, jangan lengah. Pelaku bisa menipu." },
+      { char: "narrator", text: "📝 Semuanya siap menghadapi babak terakhir." }
+    ]
+  },
+
+  // =========================
+  // PART 37 — PELUANG MENANG
+  // =========================
+  {
+    bg: "bg/night_street6.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany, kita hampir bisa menangkapnya." },
+      { char: "hany", text: "🐼 Aku siap… jangan lengah!" },
+      { char: "ogif", text: "🦊 Pastikan jalur keluar pelaku terpantau." },
+      { char: "andi", text: "🦁 Semua tim sudah siap." },
+      { char: "narrator", text: "📝 Ketegangan malam itu mencapai puncaknya." }
+    ]
+  },
+
+  // =========================
+  // PART 38 — KONFRONTASI TERAKHIR
+  // =========================
+  {
+    bg: "bg/factory_final.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir ini akhir?" },
+      { char: "iky", text: "🐻 Ya, ini akhirmu!" },
+      { char: "hany", text: "🐼 Jangan sakiti siapapun lagi!" },
+      { char: "ogif", text: "🦊 Fokus, jangan lengah!" },
+      { char: "andi", text: "🦁 Semua jalur terpantau!" }
+    ]
+  },
+
+  // =========================
+  // PART 39 — PENANGKAPAN
+  // =========================
+  {
+    bg: "bg/factory_final2.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Pelaku tertangkap! Kita berhasil!" },
+      { char: "hany", text: "🐼 Aku bangga kita bisa kerjasama." },
+      { char: "ogif", text: "🦊 Kerja bagus semuanya." },
+      { char: "andi", text: "🦁 Akhirnya semua aman." },
+      { char: "narrator", text: "📝 Kota tenang kembali. Tapi pelajaran malam ini akan selalu dikenang." }
+    ]
+  },
+
+  // =========================
+  // PART 40 — ENDING SEASON 4
+  // =========================
+  {
+    bg: "bg/office_day5.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Dengan keberanian dan kerja sama, Iky dan Hany membuktikan kemampuan mereka. Namun misteri masih menunggu di masa depan." },
+      { char: "iky", text: "🐻 Hany, kita belajar banyak malam ini." },
+      { char: "hany", text: "🐼 Ya, Iky… aku siap untuk apapun selanjutnya." },
+      { char: "ogif", text: "🦊 Kalian sudah tumbuh menjadi tim yang hebat." },
+      { char: "andi", text: "🦁 Jangan lengah, dunia ini penuh misteri baru." }
+    ]
+  },
+
+  // =========================
+  // PART 41 — PELACAKAN DALAM KOTA
+  // =========================
+  {
+    bg: "bg/city_night5.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Jejak pelaku membawa tim ke bagian kota yang gelap dan sepi." },
+      { char: "iky", text: "🐻 Hany, tetap dekat aku. Suasananya terasa aneh." },
+      { char: "hany", text: "🐼 Aku di sampingmu, Iky. Jangan khawatir." },
+      { char: "ogif", text: "🦊 Semua jalur sudah terpantau, jangan lengah." },
+      { char: "andi", text: "🦁 Pelaku mungkin menunggu untuk memancing kita." }
+    ]
+  },
+
+  // =========================
+  // PART 42 — PETUNJUK MISTERIUS
+  // =========================
+  {
+    bg: "bg/alley_dark.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Aku menemukan sehelai kain dengan simbol yang sama!" },
+      { char: "iky", text: "🐻 Simbol ini… pelaku sengaja meninggalkan tanda untuk kita." },
+      { char: "ogif", text: "🦊 Ini seperti jebakan psikologis, hati-hati." },
+      { char: "andi", text: "🦁 Semua jalur sudah aku siapkan kamera." },
+      { char: "narrator", text: "📝 Tim mulai menyadari pelaku ini lebih licik daripada sebelumnya." }
+    ]
+  },
+
+  // =========================
+  // PART 43 — KONFRONTASI KEDUA
+  // =========================
+  {
+    bg: "bg/warehouse_night.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menebakku? Aku selalu selangkah di depan." },
+      { char: "iky", text: "🐻 Tidak! Kami akan hentikanmu!" },
+      { char: "hany", text: "🐼 Aku bantu Iky!" },
+      { char: "ogif", text: "🦊 Jangan gegabah, tetap di posisi." },
+      { char: "andi", text: "🦁 Koordinasi sekarang!" }
+    ]
+  },
+
+  // =========================
+  // PART 44 — HANY MENYELAMATKAN IKY
+  // =========================
+  {
+    bg: "bg/warehouse_upper.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Iky… cepat! Kau hampir jatuh!" },
+      { char: "iky", text: "🐻 Hany… terima kasih…" },
+      { char: "ogif", text: "🦊 Hany, luar biasa! Kau menyelamatkannya tepat waktu." },
+      { char: "andi", text: "🦁 Pelaku tidak menyangka kita tetap solid." },
+      { char: "narrator", text: "📝 Keberanian Hany membuat tim tetap aman, meski bahaya semakin dekat." }
+    ]
+  },
+
+  // =========================
+  // PART 45 — PETUNJUK DALANG
+  // =========================
+  {
+    bg: "bg/evidence_room.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Semua simbol ini ternyata membentuk pola lokasi terakhir korban." },
+      { char: "hany", text: "🐼 Aku bisa bantu menyatukan semua kode." },
+      { char: "ogif", text: "🦊 Hebat Hany, analisismu cepat." },
+      { char: "andi", text: "🦁 Jika kita gabungkan, kita bisa tebak target terakhir pelaku." },
+      { char: "narrator", text: "📝 Mereka akhirnya menemukan petunjuk yang bisa mengungkap dalang sebenarnya." }
+    ]
+  },
+
+  // =========================
+  // PART 46 — PELACAKAN TERAKHIR
+  // =========================
+  {
+    bg: "bg/abandoned_factory_night.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany, jalur ini terlihat mencurigakan." },
+      { char: "hany", text: "🐼 Aku lihat sesuatu di sudut… mungkin jebakan." },
+      { char: "ogif", text: "🦊 Tetap fokus, jangan lengah!" },
+      { char: "andi", text: "🦁 Semua jalur sudah terpantau." },
+      { char: "narrator", text: "📝 Malam itu tegang, setiap langkah mereka penuh waspada." }
+    ]
+  },
+
+  // =========================
+  // PART 47 — KONFRONTASI TERAKHIR
+  // =========================
+  {
+    bg: "bg/factory_final3.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Kalian pikir bisa menahanku? Aku selalu selangkah di depan." },
+      { char: "iky", text: "🐻 Tidak! Ini akhirmu!" },
+      { char: "hany", text: "🐼 Aku akan bantu!" },
+      { char: "ogif", text: "🦊 Tetap tenang, jangan gegabah." },
+      { char: "andi", text: "🦁 Semua jalur terkepung." }
+    ]
+  },
+
+  // =========================
+  // PART 48 — PERTOLONGAN KRITIS HANY
+  // =========================
+  {
+    bg: "bg/factory_final4.jpg",
+    lines: [
+      { char: "hany", text: "🐼 Cepat! Korban hampir terjatuh dari lantai atas!" },
+      { char: "iky", text: "🐻 Hany… hati-hati!" },
+      { char: "ogif", text: "🦊 Tarik korban dengan aman!" },
+      { char: "andi", text: "🦁 Aku pantau dari luar." },
+      { char: "narrator", text: "📝 Hany menjadi penyelamat kunci, membuktikan dirinya sebagai partner sejati Iky." }
+    ]
+  },
+
+  // =========================
+  // PART 49 — DALANG TERUNGKAP
+  // =========================
+  {
+    bg: "bg/factory_final5.jpg",
+    lines: [
+      { char: "noname", text: "🐺 Aku tak pernah terlihat berbeda… semua mengira aku orang biasa." },
+      { char: "iky", text: "🐻 Jadi kau dalangnya… tapi kenapa?" },
+      { char: "hany", text: "🐼 Aku tidak menyangka…!" },
+      { char: "ogif", text: "🦊 Luar biasa licik, tak mudah ditebak." },
+      { char: "andi", text: "🦁 Semua bukti cocok. Akhirnya kita berhasil." }
+    ]
+  },
+
+  // =========================
+  // PART 50 — ENDING SEASON 4
+  // =========================
+  {
+    bg: "bg/office_day6.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Dengan keberanian, kecerdikan, dan kerja sama, Iky dan Hany menyelesaikan kasus besar ini. Namun misteri dunia kriminal tetap menunggu di masa depan." },
+      { char: "iky", text: "🐻 Hany, kita belajar banyak malam ini." },
+      { char: "hany", text: "🐼 Ya, Iky… aku siap menghadapi apapun selanjutnya." },
+      { char: "ogif", text: "🦊 Kalian sudah jadi tim yang hebat." },
+      { char: "andi", text: "🦁 Jangan lengah, dunia selalu penuh teka-teki baru." }
+    ]
+  },
+
+  // =========================
+  // PART 51 — CREDIT ROLL CINEMATIC 1
+  // =========================
+  {
+    bg: "bg/city_sunset.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Semua anggota tim beristirahat setelah malam penuh ketegangan." },
+      { char: "iky", text: "🐻 Kasus ini selesai, tapi aku merasa masih ada yang tersembunyi…" },
+      { char: "hany", text: "🐼 Iky, kita selamat berkat kerja sama tim. Aku bangga padamu." },
+      { char: "ogif", text: "🦊 Kalian berdua sudah menunjukkan keberanian luar biasa." },
+      { char: "andi", text: "🦁 Ini bukan akhir, dunia selalu menyimpan teka-teki baru." }
+    ]
+  },
+
+  // =========================
+  // PART 52 — CREDIT ROLL CINEMATIC 2
+  // =========================
+  {
+    bg: "bg/office_night.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Kamera perlahan zoom ke tumpukan bukti kasus terakhir." },
+      { char: "narrator", text: "📝 Lampu kantor remang, bayangan menari di dinding." },
+      { char: "noname", text: "🐺 Kalian pikir ini sudah berakhir? Tunggu saja…" }
+    ]
+  },
+
+  // =========================
+  // PART 53 — GRAYSCALE DAN EMOSI
+  // =========================
+  {
+    bg: "bg/office_grayscale.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Sebuah momen sendu, mengingat korban yang hampir jatuh, Iky hampir mati…" },
+      { char: "iky", text: "🐻 Aku merasa begitu rapuh malam itu… tapi Hany menyelamatkanku." },
+      { char: "hany", text: "🐼 Aku tidak akan membiarkanmu hilang." }
+    ]
+  },
+
+  // =========================
+  // PART 54 — PETIR DAN TEKANAN PSIKOLOGIS
+  // =========================
+  {
+    bg: "bg/factory_storm.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Petir menyambar saat dalang muncul di bayangan. Suasana mencekam." },
+      { char: "noname", text: "🐺 Kalian pikir aku lemah? Aku selalu mengamati dari jauh." },
+      { char: "ogif", text: "🦊 Semua gerakan terpantau. Jangan lengah!" },
+      { char: "andi", text: "🦁 Ini tidak bisa dianggap remeh…" }
+    ]
+  },
+
+  // =========================
+  // PART 55 — AFTER CREDIT TEASER
+  // =========================
+  {
+    bg: "bg/warehouse_door.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Setelah semua selesai, sebuah pintu misterius ditemukan di gudang lama." },
+      { char: "iky", text: "🐻 Pintu ini… belum pernah terlihat sebelumnya." },
+      { char: "hany", text: "🐼 Rasanya ada yang menunggu kita di dalam…" },
+      { char: "ogif", text: "🦊 Siapapun yang ada di sana, ini bisa jadi petunjuk kasus berikutnya." },
+      { char: "andi", text: "🦁 Semua jalur diamankan. Kita harus siap." }
+    ]
+  },
+
+  // =========================
+  // PART 56 — HINT SEASON 5 1
+  // =========================
+  {
+    bg: "bg/night_city2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Kota tetap tampak tenang, namun ancaman baru mulai muncul…" },
+      { char: "narrator", text: "📝 Jejak dalang lama tampak memudar, tapi ada sesuatu yang lebih gelap di balik bayangan." },
+      { char: "noname", text: "🐺 Kalian pikir aku sudah berhenti? Ini baru permulaan…" }
+    ]
+  },
+
+  // =========================
+  // PART 57 — HINT SEASON 5 2
+  // =========================
+  {
+    bg: "bg/office_morning.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany, kita harus lebih siap. Aku rasa ini tidak akan mudah." },
+      { char: "hany", text: "🐼 Aku siap, Iky. Bersama, kita bisa hadapi apapun." },
+      { char: "ogif", text: "🦊 Kedua kalian sudah jadi tim tangguh. Aku yakin kalian bisa menghadapinya." },
+      { char: "andi", text: "🦁 Kita tidak bisa lengah. Dunia selalu menyimpan teka-teki baru." }
+    ]
+  },
+
+  // =========================
+  // PART 58 — CLOSING CINEMATIC
+  // =========================
+  {
+    bg: "bg/city_sunset2.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Matahari tenggelam, menandai akhir dari babak ini, namun bayangan misteri tetap ada." },
+      { char: "iky", text: "🐻 Ini bukan akhir, Hany… kita harus siap untuk apapun." },
+      { char: "hany", text: "🐼 Aku akan selalu di sisimu." },
+      { char: "ogif", text: "🦊 Semua kerja keras kalian patut dihargai." },
+      { char: "andi", text: "🦁 Jangan lengah, misteri berikutnya menunggu." }
+    ]
+  },
+
+  // =========================
+  // PART 59 — SEASON 5 TEASER 1
+  // =========================
+  {
+    bg: "bg/forest_mist.jpg",
+    lines: [
+      { char: "narrator", text: "📝 Di hutan terpencil, bayangan baru mulai bergerak… sesuatu yang lebih gelap dari sebelumnya." },
+      { char: "noname", text: "🐺 Siapkan diri kalian… permainan baru akan dimulai." }
+    ]
+  },
+
+  // =========================
+  // PART 60 — SEASON 5 TEASER 2
+  // =========================
+  {
+    bg: "bg/abandoned_house.jpg",
+    lines: [
+      { char: "iky", text: "🐻 Hany… aku merasa ini akan berbeda dari semua kasus sebelumnya." },
+      { char: "hany", text: "🐼 Aku siap, Iky… kita hadapi bersama." },
+      { char: "narrator", text: "📝 Season 5 akan menghadirkan teka-teki yang lebih gelap, plot twist yang lebih kompleks, dan ancaman baru yang tak terduga…" }
+    ]
+  }
+  
+];
+ // nanti isi cerita bisa dilanjutkan
+ 
+let p=0,l=0;
+
+function rain(on){
+  const w=document.getElementById("weather");
+  w.innerHTML="";
+  if(!on) return;
+  for(let i=0;i<60;i++){
+    const d=document.createElement("div");
+    d.className="drop";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=1+Math.random()+"s";
+    w.appendChild(d);
+  }
+}
+function jumpscare(){
+  document.getElementById("flash").classList.add("flash");
+  document.getElementById("app").classList.add("shake");
+  setTimeout(()=>{
+    document.getElementById("flash").classList.remove("flash");
+    document.getElementById("app").classList.remove("shake");
+  },400);
+}
+
+function type(el,text,cb){
+  el.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i]||"";
+    i++;
+    if(i>=text.length){clearInterval(t);cb&&cb()}
+  },50);
+}
+
+function mood(txt){
+  return /sunyi|gelap|darah|mati|ketukan|tangis|AAAA/i.test(txt);
+}
+
+function showLine(){
+  document.querySelectorAll(".bubble").forEach(b=>{b.classList.remove("show");b.innerHTML=""});
+  const line=parts[p]?.lines[l];
+  if(!line) return;
+  const bubble=document.getElementById(line.char+"Bubble");
+  if(!bubble) return;
+  if(mood(line.text)){
+    rain(true);
+    jumpscare();
+    if(line.char=="noname"){ setTimeout(()=>{jumpscare()},300); }
+  } else rain(false);
+
+  type(bubble,line.text,()=>{
+    setTimeout(()=>{
+      l++;
+      if(l<parts[p].lines.length) showLine();
+    },2500);
+  });
+  bubble.classList.add("show");
+}
+
+function render(){
+  l=0;
+  if(parts[p]) document.getElementById("bg").style.backgroundImage=`url('${parts[p].bg}')`;
+  showLine();
+}
+
+function nextPart(){if(p<parts.length-1){p++;render()}}
+function prevPart(){if(p>0){p--;render()}}
+
+render();
+</script>
+
+<!-- ======= FOOTER CINEMATIC PRO ======= -->
+<div id="footerCine">
+
+  <canvas id="noise"></canvas>
+
+  <div class="eye">👁</div>
+
+  <div class="seasonBox">
+    <h3 id="seasonText">SEASON BERIKUTNYA</h3>
+
+    <div class="loadingBar">
+      <div class="loadingFill"></div>
+    </div>
+
+    <p class="hint">
+      Misteri belum berakhir…<br>
+      Seseorang masih mengamati setiap langkahmu.
+    </p>
+  </div>
+
+</div>
+
+<audio id="ambience" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3" type="audio/mpeg">
+</audio>
+
+<style>
+#footerCine{
+  position:relative;
+  max-width:900px;
+  margin:30px auto;
+  padding:26px;
+  border-radius:18px;
+  background:#000;
+  color:white;
+  overflow:hidden;
+}
+
+/* STATIC NOISE */
+#noise{
+  position:absolute;
+  inset:0;
+  opacity:.15;
+  z-index:0;
+}
+
+/* EYE */
+.eye{
+  position:absolute;
+  font-size:42px;
+  left:50%;
+  top:20px;
+  transform:translateX(-50%);
+  animation:blink 5s infinite;
+  z-index:1;
+}
+
+/* CONTENT */
+.seasonBox{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.seasonBox h3{
+  letter-spacing:3px;
+  font-weight:800;
+  margin-bottom:16px;
+  animation:glitch 3s infinite;
+}
+
+.loadingBar{
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  overflow:hidden;
+  margin:14px 0;
+}
+
+.loadingFill{
+  height:100%;
+  width:0%;
+  background:#7b5cff;
+  animation:loadLoop 4s linear infinite;
+}
+
+.hint{
+  opacity:.7;
+  font-size:.9rem;
+}
+
+/* Animations */
+@keyframes loadLoop{
+  0%{width:0}
+  50%{width:100%}
+  100%{width:0}
+}
+
+@keyframes blink{
+  0%,90%,100%{opacity:1}
+  95%{opacity:0}
+}
+
+@keyframes glitch{
+  0%{text-shadow:2px 0 red}
+  25%{text-shadow:-2px 0 blue}
+  50%{text-shadow:2px 0 purple}
+  75%{text-shadow:-2px 0 cyan}
+  100%{text-shadow:none}
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .eye{font-size:30px}
+}
+</style>
+
+<script>
+/* ===== TEXT ROTATE ===== */
+const text=[
+"SEASON BERIKUTNYA",
+"COMING SOON",
+"STORY LOADING",
+"PLEASE WAIT..."
+];
+let idx=0;
+setInterval(()=>{
+  document.getElementById("seasonText").textContent=text[idx];
+  idx=(idx+1)%text.length;
+},2500);
+
+/* ===== STATIC NOISE ===== */
+const canvas=document.getElementById("noise");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+}
+window.onresize=resize;
+resize();
+
+function noise(){
+  const img=ctx.createImageData(canvas.width,canvas.height);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=Math.random()*255;
+    img.data[i]=v;
+    img.data[i+1]=v;
+    img.data[i+2]=v;
+    img.data[i+3]=30;
+  }
+  ctx.putImageData(img,0,0);
+  requestAnimationFrame(noise);
+}
+noise();
+
+/* ===== AUTO AMBIENT SOUND ===== */
+window.addEventListener("click",()=>{
+  document.getElementById("ambience").play();
+},{once:true});
+</script>
+
+</body>
+</html>
+
